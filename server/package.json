@@ -1,0 +1,14 @@
+{
+  "name": "inanna-leadsync",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Push-only backup API for the استودیو اینانا exhibition tablet app",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.10.0",
+    "express": "^4.21.2"
+  }
+}

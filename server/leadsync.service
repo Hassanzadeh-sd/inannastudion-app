@@ -1,0 +1,13 @@
+[Unit]
+Description=Inanna Studio leads sync API
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/node /opt/leadsync/src/server.js
+EnvironmentFile=/etc/leadsync.env
+User=www-data
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
