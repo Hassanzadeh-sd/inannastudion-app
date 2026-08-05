@@ -7,7 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "inannastudio",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#17121F",
+    "backgroundColor": "#0E0A18",
     "platforms": ["android"],
     "extra": {
       "supportsRTL": true,
@@ -16,7 +16,7 @@
     "android": {
       "package": "com.inannastudio.leads",
       "adaptiveIcon": {
-        "backgroundColor": "#17121F",
+        "backgroundColor": "#0E0A18",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -29,7 +29,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#17121F",
+          "backgroundColor": "#0E0A18",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 120
         }
