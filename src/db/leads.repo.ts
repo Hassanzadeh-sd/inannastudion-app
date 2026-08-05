@@ -15,6 +15,7 @@ export interface Lead {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+  verified_at: string | null;
   dirty: number;
   pushed_at: string | null;
 }
@@ -46,6 +47,16 @@ export async function captureLead(phone: string, name?: string | null): Promise<
     [phone],
   );
   return row!.id;
+}
+
+/** Mark a lead as SMS-verified (joined the customers club). */
+export async function setLeadVerified(id: string): Promise<void> {
+  const db = await getDb();
+  const ts = now();
+  await db.runAsync(
+    'UPDATE leads SET verified_at = ?, updated_at = ?, dirty = 1 WHERE id = ?',
+    [ts, ts, id],
+  );
 }
 
 export async function setLeadName(id: string, name: string): Promise<void> {

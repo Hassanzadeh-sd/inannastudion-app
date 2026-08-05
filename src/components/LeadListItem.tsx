@@ -40,6 +40,7 @@ export const LeadListItem = memo(function LeadListItem({ lead, onPress }: Props)
           <Text style={[styles.status, { color: STATUS_COLOR[lead.status] }]}>
             {STATUS_FA[lead.status]}
           </Text>
+          {lead.verified_at ? <Text style={styles.member}>✦ عضو کلوپ</Text> : null}
         </View>
         <Text style={styles.phone}>{ltrIsolate(formatPhoneFa(lead.phone))}</Text>
         <Text style={styles.date}>{formatFaDateTime(lead.created_at)}</Text>
@@ -80,6 +81,7 @@ const styles = StyleSheet.create({
     paddingVertical: 1,
   },
   status: { fontFamily: fonts.medium, fontSize: 14 },
+  member: { fontFamily: fonts.medium, fontSize: 13, color: colors.success },
   phone: { fontFamily: fonts.medium, fontSize: 18, color: colors.accentSoft },
   date: { fontFamily: fonts.regular, fontSize: 13, color: colors.textFaint },
   stars: { fontSize: 24, letterSpacing: 2 },

@@ -9,20 +9,26 @@ import {
 } from 'react-native';
 import { useFocusEffect, useRouter } from 'expo-router';
 import * as NavigationBar from 'expo-navigation-bar';
-import { colors, fonts, radius, spacing } from '../theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, fonts, gradients, radius, spacing } from '../theme';
 import { PersianKeypad } from '../components/PersianKeypad';
+import { PinDots } from '../components/PinDots';
 import { BigButton } from '../components/BigButton';
-import { captureLead, setLeadName } from '../db/leads.repo';
+import { captureLead, setLeadName, setLeadVerified } from '../db/leads.repo';
 import { bumpLeadsVersion } from '../store/leads-version';
 import { isValidIranMobile, formatPhoneFa } from '../lib/phone';
-import { ltrIsolate } from '../lib/digits';
+import { ltrIsolate, toPersianDigits } from '../lib/digits';
 import { pushSoon } from '../lib/sync';
+import { generateOtpCode, getOtpConfig, sendOtpSms } from '../lib/otp';
 
-type Phase = 'idle' | 'phone' | 'name' | 'thanks';
+type Phase = 'idle' | 'phone' | 'verify' | 'name' | 'thanks';
 
 const NAME_AUTOSKIP_MS = 20_000;
 const THANKS_RESET_MS = 5_000;
 const PHONE_IDLE_RESET_MS = 60_000;
+const VERIFY_IDLE_MS = 90_000;
+const RESEND_COOLDOWN_MS = 45_000;
+const OTP_LENGTH = 4;
 const HOTSPOT_TAPS = 5;
 const HOTSPOT_WINDOW_MS = 3_000;
 
@@ -31,7 +37,12 @@ export default function KioskScreen() {
   const [phase, setPhase] = useState<Phase>('idle');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
+  const [codeInput, setCodeInput] = useState('');
+  const [otpError, setOtpError] = useState<string | null>(null);
+  const [resendReadyAt, setResendReadyAt] = useState(0);
+  const [now, setNow] = useState(Date.now());
   const leadIdRef = useRef<string | null>(null);
+  const otpCodeRef = useRef<string | null>(null);
   const hotspotTaps = useRef<number[]>([]);
 
   // Swallow the hardware back button while the kiosk is front and center.
@@ -50,10 +61,13 @@ export default function KioskScreen() {
     setPhase('idle');
     setPhone('');
     setName('');
+    setCodeInput('');
+    setOtpError(null);
     leadIdRef.current = null;
+    otpCodeRef.current = null;
   }, []);
 
-  // Phase timers: thanks auto-reset, name auto-skip, abandoned-entry reset.
+  // Phase timers: thanks auto-reset, name auto-skip, abandoned-entry resets.
   useEffect(() => {
     if (phase === 'thanks') {
       const t = setTimeout(reset, THANKS_RESET_MS);
@@ -67,26 +81,76 @@ export default function KioskScreen() {
       const t = setTimeout(reset, PHONE_IDLE_RESET_MS);
       return () => clearTimeout(t);
     }
+    if (phase === 'verify') {
+      // Visitor walked away mid-verification: the number is already saved.
+      const t = setTimeout(() => setPhase('thanks'), VERIFY_IDLE_MS);
+      return () => clearTimeout(t);
+    }
     return undefined;
-  }, [phase, phone, reset]);
+  }, [phase, phone, codeInput, reset]);
+
+  // 1-second tick for the resend countdown.
+  useEffect(() => {
+    if (phase !== 'verify') return undefined;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [phase]);
 
   const onHotspotTap = () => {
-    const now = Date.now();
-    hotspotTaps.current = [...hotspotTaps.current.filter((t) => now - t < HOTSPOT_WINDOW_MS), now];
+    const ts = Date.now();
+    hotspotTaps.current = [...hotspotTaps.current.filter((t) => ts - t < HOTSPOT_WINDOW_MS), ts];
     if (hotspotTaps.current.length >= HOTSPOT_TAPS) {
       hotspotTaps.current = [];
       router.push('/pin');
     }
   };
 
+  const sendCode = async (): Promise<boolean> => {
+    const config = await getOtpConfig();
+    if (!config) return false;
+    const code = otpCodeRef.current ?? generateOtpCode();
+    const sent = await sendOtpSms(config, phone, code);
+    if (sent) {
+      otpCodeRef.current = code;
+      setResendReadyAt(Date.now() + RESEND_COOLDOWN_MS);
+    }
+    return sent;
+  };
+
   const submitPhone = async () => {
     if (!isValidIranMobile(phone)) return;
-    // Insert immediately: if the visitor walks away mid-name, the number is kept.
+    // Insert immediately: whatever happens next, the number is kept.
     leadIdRef.current = await captureLead(phone);
     bumpLeadsVersion();
     pushSoon();
-    setPhase('name');
+    // SMS verification only when configured and the SMS actually goes out.
+    if (await sendCode()) {
+      setCodeInput('');
+      setOtpError(null);
+      setPhase('verify');
+    } else {
+      setPhase('name');
+    }
   };
+
+  const submitCode = async (entered: string) => {
+    if (entered === otpCodeRef.current) {
+      if (leadIdRef.current) {
+        await setLeadVerified(leadIdRef.current);
+        bumpLeadsVersion();
+        pushSoon();
+      }
+      setPhase('name');
+    } else {
+      setOtpError('کد اشتباه است؛ دوباره تلاش کنید');
+      setCodeInput('');
+    }
+  };
+
+  useEffect(() => {
+    if (phase === 'verify' && codeInput.length === OTP_LENGTH) void submitCode(codeInput);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [codeInput, phase]);
 
   const submitName = async () => {
     const trimmed = name.trim();
@@ -98,14 +162,17 @@ export default function KioskScreen() {
     setPhase('thanks');
   };
 
+  const resendSeconds = Math.max(0, Math.ceil((resendReadyAt - now) / 1000));
+
   return (
-    <View style={styles.root}>
+    <LinearGradient colors={gradients.backdrop} style={styles.root}>
       {phase === 'idle' && (
         <Pressable style={styles.idle} onPress={() => setPhase('phone')}>
           <Text style={styles.brandMark}>✦</Text>
           <Text style={styles.brandTitle}>استودیو اینانا</Text>
+          <Text style={styles.clubTitle}>کلوپ مشتریان اینانا</Text>
           <View style={styles.divider} />
-          <Text style={styles.idlePrompt}>برای ثبت شماره تماس، صفحه را لمس کنید</Text>
+          <Text style={styles.idlePrompt}>برای عضویت، صفحه را لمس کنید</Text>
         </Pressable>
       )}
 
@@ -119,7 +186,7 @@ export default function KioskScreen() {
               </Text>
             </View>
             <BigButton
-              label="ثبت شماره"
+              label="عضویت در کلوپ"
               size="lg"
               disabled={!isValidIranMobile(phone)}
               onPress={submitPhone}
@@ -132,6 +199,39 @@ export default function KioskScreen() {
               onDigit={(d) => setPhone((p) => (p.length < 11 ? p + d : p))}
               onBackspace={() => setPhone((p) => p.slice(0, -1))}
               onClear={() => setPhone('')}
+            />
+          </View>
+        </View>
+      )}
+
+      {phase === 'verify' && (
+        <View style={styles.split}>
+          <View style={styles.pane}>
+            <Text style={styles.paneTitle}>کد تأیید پیامک‌شده را وارد کنید</Text>
+            <Text style={styles.verifySub}>
+              کد به شماره {ltrIsolate(formatPhoneFa(phone))} ارسال شد
+            </Text>
+            <PinDots length={OTP_LENGTH} filled={codeInput.length} />
+            {otpError ? <Text style={styles.otpError}>{otpError}</Text> : null}
+            <View style={styles.verifyActions}>
+              <BigButton
+                label={
+                  resendSeconds > 0
+                    ? `ارسال مجدد (${toPersianDigits(resendSeconds)})`
+                    : 'ارسال مجدد کد'
+                }
+                variant="ghost"
+                disabled={resendSeconds > 0}
+                onPress={() => void sendCode()}
+              />
+              <BigButton label="رد شدن" variant="ghost" onPress={() => setPhase('name')} />
+            </View>
+          </View>
+          <View style={styles.pane}>
+            <PersianKeypad
+              keyHeight={92}
+              onDigit={(d) => setCodeInput((c) => (c.length < OTP_LENGTH ? c + d : c))}
+              onBackspace={() => setCodeInput((c) => c.slice(0, -1))}
             />
           </View>
         </View>
@@ -160,24 +260,25 @@ export default function KioskScreen() {
 
       {phase === 'thanks' && (
         <View style={styles.center}>
-          <Text style={styles.thanksMark}>✓</Text>
+          <Text style={styles.thanksMark}>✦</Text>
           <Text style={styles.thanksTitle}>متشکریم!</Text>
-          <Text style={styles.thanksBody}>کارشناسان استودیو اینانا با شما تماس می‌گیرند</Text>
+          <Text style={styles.thanksBody}>به کلوپ مشتریان اینانا خوش آمدید</Text>
         </View>
       )}
 
       {/* Hidden staff hotspot: 5 taps in the top-start corner within 3 s. */}
       <Pressable style={styles.hotspot} onPress={onHotspotTap} />
-    </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: colors.bg },
+  root: { flex: 1 },
   idle: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
   brandMark: { fontSize: 64, color: colors.accent },
   brandTitle: { fontFamily: fonts.black, fontSize: 72, color: colors.text },
-  divider: { width: 120, height: 2, backgroundColor: colors.accent, marginVertical: spacing.md },
+  clubTitle: { fontFamily: fonts.medium, fontSize: 30, color: colors.violet },
+  divider: { width: 140, height: 2, backgroundColor: colors.accent2, marginVertical: spacing.md },
   idlePrompt: { fontFamily: fonts.medium, fontSize: 26, color: colors.textMuted },
   split: {
     flex: 1,
@@ -188,6 +289,19 @@ const styles = StyleSheet.create({
   },
   pane: { flex: 1, gap: spacing.lg, justifyContent: 'center' },
   paneTitle: { fontFamily: fonts.bold, fontSize: 30, color: colors.text, textAlign: 'center' },
+  verifySub: {
+    fontFamily: fonts.regular,
+    fontSize: 20,
+    color: colors.textMuted,
+    textAlign: 'center',
+  },
+  otpError: {
+    fontFamily: fonts.medium,
+    fontSize: 18,
+    color: colors.danger,
+    textAlign: 'center',
+  },
+  verifyActions: { flexDirection: 'row', gap: spacing.md, justifyContent: 'center' },
   phoneDisplay: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
@@ -218,9 +332,9 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   nameActions: { flexDirection: 'row', gap: spacing.md },
-  thanksMark: { fontSize: 80, color: colors.success },
+  thanksMark: { fontSize: 80, color: colors.accent },
   thanksTitle: { fontFamily: fonts.black, fontSize: 56, color: colors.text },
-  thanksBody: { fontFamily: fonts.regular, fontSize: 26, color: colors.textMuted },
+  thanksBody: { fontFamily: fonts.medium, fontSize: 30, color: colors.accentSoft },
   hotspot: {
     position: 'absolute',
     top: 0,

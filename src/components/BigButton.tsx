@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
-import { colors, fonts, radius, spacing } from '../theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { colors, fonts, gradients, radius, spacing } from '../theme';
 
 interface Props {
   label: string;
@@ -18,6 +19,37 @@ export function BigButton({
   disabled = false,
   style,
 }: Props) {
+  const labelStyle = [
+    styles.label,
+    size === 'lg' && styles.labelLg,
+    variant === 'primary' ? styles.labelOnAccent : styles.labelOnDark,
+    variant === 'danger' && styles.labelDanger,
+  ];
+
+  if (variant === 'primary') {
+    return (
+      <Pressable
+        onPress={onPress}
+        disabled={disabled}
+        style={({ pressed }) => [
+          styles.shadow,
+          disabled && styles.disabled,
+          pressed && !disabled && styles.pressed,
+          style,
+        ]}
+      >
+        <LinearGradient
+          colors={gradients.button}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.base, size === 'lg' && styles.lg]}
+        >
+          <Text style={labelStyle}>{label}</Text>
+        </LinearGradient>
+      </Pressable>
+    );
+  }
+
   return (
     <Pressable
       onPress={onPress}
@@ -25,31 +57,21 @@ export function BigButton({
       style={({ pressed }) => [
         styles.base,
         size === 'lg' && styles.lg,
-        variant === 'primary' && styles.primary,
         variant === 'ghost' && styles.ghost,
-        variant === 'danger' && styles.danger,
+        variant === 'danger' && styles.dangerOutline,
         disabled && styles.disabled,
         pressed && !disabled && styles.pressed,
         style,
       ]}
     >
-      <Text
-        style={[
-          styles.label,
-          size === 'lg' && styles.labelLg,
-          variant === 'primary' ? styles.labelOnAccent : styles.labelOnDark,
-          variant === 'danger' && styles.labelDanger,
-        ]}
-      >
-        {label}
-      </Text>
+      <Text style={labelStyle}>{label}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: radius.md,
+    borderRadius: radius.sm,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
@@ -58,21 +80,28 @@ const styles = StyleSheet.create({
   lg: {
     paddingVertical: 20,
     paddingHorizontal: spacing.xl,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
   },
-  primary: { backgroundColor: colors.accent },
+  shadow: {
+    borderRadius: radius.sm,
+    elevation: 6,
+    shadowColor: '#E8579B',
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+  },
   ghost: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.violet,
   },
-  danger: {
+  dangerOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1,
     borderColor: colors.danger,
   },
   disabled: { opacity: 0.35 },
-  pressed: { opacity: 0.75, transform: [{ scale: 0.98 }] },
+  pressed: { opacity: 0.8, transform: [{ scale: 0.98 }] },
   label: { fontFamily: fonts.bold, fontSize: 18 },
   labelLg: { fontSize: 24 },
   labelOnAccent: { color: colors.onAccent },

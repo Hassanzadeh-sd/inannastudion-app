@@ -30,12 +30,21 @@ export default function SettingsScreen() {
   const sync = useSyncStatus();
   const [url, setUrl] = useState('');
   const [token, setToken] = useState('');
+  const [smsKey, setSmsKey] = useState('');
+  const [smsTemplate, setSmsTemplate] = useState('');
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    Promise.all([getSetting('sync_url'), getSetting('sync_token')]).then(([u, t]) => {
+    Promise.all([
+      getSetting('sync_url'),
+      getSetting('sync_token'),
+      getSetting('sms_api_key'),
+      getSetting('sms_template'),
+    ]).then(([u, t, k, tpl]) => {
       if (u) setUrl(u);
       if (t) setToken(t);
+      if (k) setSmsKey(k);
+      if (tpl) setSmsTemplate(tpl);
     });
   }, []);
 
@@ -43,6 +52,17 @@ export default function SettingsScreen() {
     await setSetting('sync_url', url.trim());
     await setSetting('sync_token', token.trim());
     ToastAndroid.show('تنظیمات ذخیره شد', ToastAndroid.SHORT);
+  };
+
+  const saveSms = async () => {
+    await setSetting('sms_api_key', smsKey.trim());
+    await setSetting('sms_template', smsTemplate.trim());
+    ToastAndroid.show(
+      smsKey.trim() && smsTemplate.trim()
+        ? 'کد تأیید پیامکی فعال شد'
+        : 'کد تأیید پیامکی غیرفعال است',
+      ToastAndroid.SHORT,
+    );
   };
 
   const syncNow = async () => {
@@ -60,7 +80,7 @@ export default function SettingsScreen() {
   const doExport = async (kind: 'csv' | 'xlsx') => {
     try {
       const count = kind === 'csv' ? await shareCsv() : await shareXlsx();
-      ToastAndroid.show(`${toPersianDigits(count)} سرنخ در فایل`, ToastAndroid.SHORT);
+      ToastAndroid.show(`${toPersianDigits(count)} مشتری در فایل`, ToastAndroid.SHORT);
     } catch {
       ToastAndroid.show('خروجی گرفتن ناموفق بود', ToastAndroid.LONG);
     }
@@ -111,7 +131,36 @@ export default function SettingsScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>خروجی سرنخ‌ها</Text>
+            <Text style={styles.sectionTitle}>کد تأیید پیامکی (کلوپ مشتریان)</Text>
+            <Text style={styles.label}>کلید API کاوه‌نگار</Text>
+            <TextInput
+              style={styles.ltrInput}
+              value={smsKey}
+              onChangeText={setSmsKey}
+              placeholder="Kavenegar API Key"
+              placeholderTextColor={colors.textFaint}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <Text style={styles.label}>نام قالب تأیید (template)</Text>
+            <TextInput
+              style={styles.ltrInput}
+              value={smsTemplate}
+              onChangeText={setSmsTemplate}
+              placeholder="verify-template"
+              placeholderTextColor={colors.textFaint}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <View style={styles.row}>
+              <BigButton label="ذخیره" variant="ghost" onPress={saveSms} />
+            </View>
+            <Text style={styles.hint}>
+              با کلید و قالب خالی، عضویت بدون کد تأیید ثبت می‌شود؛ اگر ارسال پیامک هم ناموفق باشد،
+              شماره باز هم ذخیره می‌شود
+            </Text>
+
+            <Text style={styles.sectionTitle}>خروجی اطلاعات مشتریان</Text>
             <View style={styles.row}>
               <BigButton label="فایل CSV" onPress={() => doExport('csv')} />
               <BigButton label="فایل Excel" onPress={() => doExport('xlsx')} />

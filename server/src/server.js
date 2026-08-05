@@ -27,17 +27,23 @@ db.exec(`
     created_at  TEXT,
     updated_at  TEXT NOT NULL,
     deleted_at  TEXT,
+    verified_at TEXT,
     device_id   TEXT,
     received_at TEXT
   )
 `);
+try {
+  db.exec('ALTER TABLE leads ADD COLUMN verified_at TEXT');
+} catch {
+  // column already exists
+}
 
 // Last-write-wins on the client-side updated_at clock; re-pushes are no-ops.
 const upsert = db.prepare(`
   INSERT INTO leads (id, phone, name, rating, note, followup, status, source,
-                     created_at, updated_at, deleted_at, device_id, received_at)
+                     created_at, updated_at, deleted_at, verified_at, device_id, received_at)
   VALUES (@id, @phone, @name, @rating, @note, @followup, @status, @source,
-          @created_at, @updated_at, @deleted_at, @device_id, @received_at)
+          @created_at, @updated_at, @deleted_at, @verified_at, @device_id, @received_at)
   ON CONFLICT(id) DO UPDATE SET
     phone = excluded.phone,
     name = excluded.name,
@@ -48,6 +54,7 @@ const upsert = db.prepare(`
     source = excluded.source,
     updated_at = excluded.updated_at,
     deleted_at = excluded.deleted_at,
+    verified_at = excluded.verified_at,
     device_id = excluded.device_id,
     received_at = excluded.received_at
   WHERE excluded.updated_at > leads.updated_at
@@ -71,6 +78,7 @@ const upsertBatch = db.transaction((records, deviceId, receivedAt) => {
       created_at: r.created_at ?? null,
       updated_at: r.updated_at,
       deleted_at: r.deleted_at ?? null,
+      verified_at: r.verified_at ?? null,
       device_id: deviceId,
       received_at: receivedAt,
     });
@@ -121,9 +129,9 @@ app.get('/leads.csv', auth, (_req, res) => {
   const rows = db
     .prepare('SELECT * FROM leads WHERE deleted_at IS NULL ORDER BY created_at')
     .all();
-  const header = 'phone,name,rating,status,note,followup,created_at,updated_at,device_id';
+  const header = 'phone,name,rating,status,verified_at,note,followup,created_at,updated_at,device_id';
   const lines = rows.map((r) =>
-    [r.phone, r.name, r.rating, r.status, r.note, r.followup, r.created_at, r.updated_at, r.device_id]
+    [r.phone, r.name, r.rating, r.status, r.verified_at, r.note, r.followup, r.created_at, r.updated_at, r.device_id]
       .map(csvCell)
       .join(','),
   );

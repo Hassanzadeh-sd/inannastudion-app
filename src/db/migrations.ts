@@ -26,6 +26,10 @@ const MIGRATIONS: string[] = [
     value TEXT NOT NULL
   );
   `,
+  // v2: SMS-verified club membership timestamp
+  `
+  ALTER TABLE leads ADD COLUMN verified_at TEXT;
+  `,
 ];
 
 export async function migrate(db: SQLiteDatabase): Promise<void> {

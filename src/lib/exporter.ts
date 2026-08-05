@@ -26,18 +26,19 @@ export async function shareCsv(): Promise<number> {
 }
 
 function leadsToXlsx(leads: Lead[]): Uint8Array {
-  const header = ['شماره تماس', 'نام', 'امتیاز', 'وضعیت', 'یادداشت', 'برنامه پیگیری', 'تاریخ ثبت'];
+  const header = ['شماره تماس', 'نام', 'امتیاز', 'وضعیت', 'عضو کلوپ', 'یادداشت', 'برنامه پیگیری', 'تاریخ ثبت'];
   const rows = leads.map((l) => [
     l.phone,
     l.name ?? '',
     l.rating ?? '',
     l.status,
+    l.verified_at ? 'بله' : '',
     l.note ?? '',
     l.followup ?? '',
     l.created_at,
   ]);
   const ws = XLSX.utils.aoa_to_sheet([header, ...rows]);
-  ws['!cols'] = [{ wch: 14 }, { wch: 24 }, { wch: 8 }, { wch: 12 }, { wch: 32 }, { wch: 32 }, { wch: 22 }];
+  ws['!cols'] = [{ wch: 14 }, { wch: 24 }, { wch: 8 }, { wch: 12 }, { wch: 10 }, { wch: 32 }, { wch: 32 }, { wch: 22 }];
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Leads');
   const buf = XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer;

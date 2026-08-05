@@ -49,7 +49,7 @@ export default function StaffLayout() {
         <Tabs.Screen
           name="leads"
           options={{
-            title: 'سرنخ‌ها',
+            title: 'مشتریان',
             tabBarIcon: ({ color, size }) => (
               <MaterialCommunityIcons name="clipboard-account-outline" color={color} size={size} />
             ),

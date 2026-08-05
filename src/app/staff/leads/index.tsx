@@ -43,7 +43,7 @@ export default function LeadsListScreen() {
       if (cancelled) return;
       setLeads(rows);
       setSubtitle(
-        `${toPersianDigits(counts.total)} سرنخ • ${toPersianDigits(counts.needsDetails)} بدون نام`,
+        `${toPersianDigits(counts.total)} مشتری • ${toPersianDigits(counts.needsDetails)} بدون نام`,
       );
     })();
     return () => {
@@ -58,7 +58,7 @@ export default function LeadsListScreen() {
 
   return (
     <View style={styles.root}>
-      <StaffHeader title="سرنخ‌های نمایشگاه" subtitle={subtitle} />
+      <StaffHeader title="ثبت اطلاعات مشتریان" subtitle={subtitle} />
       <View style={styles.filters}>
         <View style={styles.chipRow}>
           {FILTERS.map((f) => (
@@ -89,7 +89,7 @@ export default function LeadsListScreen() {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <Text style={styles.empty}>
-            {filter === 'all' ? 'هنوز سرنخی ثبت نشده است' : 'موردی با این فیلتر پیدا نشد'}
+            {filter === 'all' ? 'هنوز مشتری‌ای ثبت نشده است' : 'موردی با این فیلتر پیدا نشد'}
           </Text>
         }
       />

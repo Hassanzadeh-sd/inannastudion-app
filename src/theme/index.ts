@@ -1,23 +1,32 @@
 /**
- * Design tokens for استودیو اینانا.
- * Dark aubergine surface with a champagne-gold accent; Vazirmatn everywhere.
+ * Design tokens for استودیو اینانا — "fantasy" edition.
+ * Deep space-violet surfaces, gold→magenta gradient accents, sharp corners.
  */
 export const colors = {
-  bg: '#17121F',
-  surface: '#221A2E',
-  surfaceRaised: '#2C2239',
-  border: '#3A2E4A',
-  accent: '#D9A84E',
-  accentSoft: '#E7C98B',
-  onAccent: '#221A2E',
-  text: '#F5F0E8',
-  textMuted: '#A79BB8',
-  textFaint: '#6F6482',
-  success: '#7FC98B',
-  danger: '#E07A6B',
-  star: '#E9B94F',
-  starOff: '#4A3E5C',
+  bg: '#0E0A18',
+  surface: '#1B1329',
+  surfaceRaised: '#271A3D',
+  border: '#43306B',
+  accent: '#F3C14F',
+  accentSoft: '#F7D68A',
+  accent2: '#E8579B',
+  violet: '#9D6BFF',
+  onAccent: '#241335',
+  text: '#F7F2FF',
+  textMuted: '#B3A6CF',
+  textFaint: '#786C96',
+  success: '#5FD68B',
+  danger: '#FF6B6B',
+  star: '#F3C14F',
+  starOff: '#4A3A6B',
 } as const;
+
+/** Gradient stops (start → end) used by primary buttons and backdrops. */
+export const gradients = {
+  button: ['#F3C14F', '#E8579B'] as const,
+  backdrop: ['#221238', '#0E0A18'] as const,
+  card: ['#2A1C44', '#1B1329'] as const,
+};
 
 export const fonts = {
   regular: 'Vazirmatn_400Regular',
@@ -35,9 +44,10 @@ export const spacing = {
   xxl: 64,
 } as const;
 
+/** Sharp-corner scale. */
 export const radius = {
-  sm: 10,
-  md: 16,
-  lg: 24,
+  sm: 4,
+  md: 8,
+  lg: 14,
   pill: 999,
 } as const;

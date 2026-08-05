@@ -23,7 +23,7 @@ export function Chip({ label, selected, onPress, small = false }: Props) {
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: radius.pill,
+    borderRadius: radius.sm,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
@@ -31,7 +31,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
   },
   small: { paddingVertical: 4, paddingHorizontal: 12 },
-  selected: { backgroundColor: colors.accent, borderColor: colors.accent },
+  selected: {
+    backgroundColor: colors.accent,
+    borderColor: colors.accent2,
+  },
   label: { fontFamily: fonts.medium, fontSize: 16, color: colors.textMuted },
   labelSmall: { fontSize: 14 },
   labelSelected: { color: colors.onAccent, fontFamily: fonts.bold },

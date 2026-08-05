@@ -89,7 +89,7 @@ export default function LeadDetailScreen() {
   };
 
   const remove = () => {
-    Alert.alert('حذف سرنخ', 'این سرنخ حذف شود؟', [
+    Alert.alert('حذف مشتری', 'اطلاعات این مشتری حذف شود؟', [
       { text: 'انصراف', style: 'cancel' },
       {
         text: 'حذف',
