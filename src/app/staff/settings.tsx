@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   TextInput,
   ToastAndroid,
@@ -32,6 +33,7 @@ export default function SettingsScreen() {
   const [token, setToken] = useState('');
   const [smsKey, setSmsKey] = useState('');
   const [smsTemplate, setSmsTemplate] = useState('');
+  const [serverMode, setServerMode] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -40,13 +42,24 @@ export default function SettingsScreen() {
       getSetting('sync_token'),
       getSetting('sms_api_key'),
       getSetting('sms_template'),
-    ]).then(([u, t, k, tpl]) => {
+      getSetting('server_mode'),
+    ]).then(([u, t, k, tpl, sm]) => {
       if (u) setUrl(u);
       if (t) setToken(t);
       if (k) setSmsKey(k);
       if (tpl) setSmsTemplate(tpl);
+      setServerMode(sm === '1');
     });
   }, []);
+
+  const toggleServerMode = async (value: boolean) => {
+    setServerMode(value);
+    await setSetting('server_mode', value ? '1' : '');
+    ToastAndroid.show(
+      value ? 'حالت همکار فعال شد؛ فهرست مشتریان از سرور خوانده می‌شود' : 'حالت همکار غیرفعال شد',
+      ToastAndroid.SHORT,
+    );
+  };
 
   const saveSync = async () => {
     await setSetting('sync_url', url.trim());
@@ -128,6 +141,22 @@ export default function SettingsScreen() {
               {sync.lastSyncAt ? ` • آخرین ارسال: ${formatFaDateTime(sync.lastSyncAt)}` : ''}
             </Text>
             {sync.lastError ? <Text style={styles.errorText}>{sync.lastError}</Text> : null}
+
+            <Text style={styles.sectionTitle}>حالت همکار</Text>
+            <View style={styles.switchRow}>
+              <Switch
+                value={serverMode}
+                onValueChange={toggleServerMode}
+                thumbColor={serverMode ? colors.accent : colors.textFaint}
+                trackColor={{ false: colors.surfaceRaised, true: colors.accent2 }}
+              />
+              <Text style={styles.switchLabel}>نمایش و ویرایش مشتریان از سرور</Text>
+            </View>
+            <Text style={styles.hint}>
+              برای گوشی همکاران روشن کنید: فهرست مشتریان همه دستگاه‌ها را زنده می‌بینند و تکمیل
+              می‌کنند (نیازمند اینترنت). روی تبلت نمایشگاه خاموش بماند؛ ثبت شماره در هر حالت
+              آفلاین کار می‌کند
+            </Text>
           </View>
 
           <View style={styles.section}>
@@ -209,6 +238,8 @@ const styles = StyleSheet.create({
     writingDirection: 'ltr',
   },
   row: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.sm },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  switchLabel: { fontFamily: fonts.medium, fontSize: 16, color: colors.text, flexShrink: 1 },
   statusText: { fontFamily: fonts.regular, fontSize: 15, color: colors.textMuted },
   errorText: { fontFamily: fonts.regular, fontSize: 14, color: colors.danger },
   hint: { fontFamily: fonts.regular, fontSize: 14, color: colors.textFaint },

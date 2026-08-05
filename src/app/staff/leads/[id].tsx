@@ -18,8 +18,13 @@ import {
   getLead,
   softDeleteLead,
   updateLead,
+  type Lead,
+  type LeadPatch,
   type LeadStatus,
 } from '../../../db/leads.repo';
+import { getSetting } from '../../../db/settings.repo';
+import { updateServerLead } from '../../../lib/server-leads';
+import { useServerLeads } from '../../../store/server-leads';
 import { bumpLeadsVersion } from '../../../store/leads-version';
 import { FOLLOWUP_CHIPS } from '../../../constants/team';
 import { formatFaDateTime, ltrIsolate } from '../../../lib/digits';
@@ -39,7 +44,9 @@ function splitFollowup(followup: string | null): { chips: string[]; extra: strin
 export default function LeadDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const serverStore = useServerLeads();
 
+  const [serverMode, setServerMode] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [phone, setPhone] = useState('');
   const [createdAt, setCreatedAt] = useState('');
@@ -52,7 +59,12 @@ export default function LeadDetailScreen() {
 
   useEffect(() => {
     if (!id) return;
-    getLead(id).then((lead) => {
+    (async () => {
+      const isServer = (await getSetting('server_mode')) === '1';
+      setServerMode(isServer);
+      const lead: Lead | null = isServer
+        ? (useServerLeads.getState().leads.find((l) => l.id === id) ?? null)
+        : await getLead(id);
       if (!lead) {
         router.back();
         return;
@@ -65,8 +77,9 @@ export default function LeadDetailScreen() {
       const f = splitFollowup(lead.followup);
       setChips(f.chips);
       setExtraPlan(f.extra);
+      setStatus(lead.status);
       setLoaded(true);
-    });
+    })();
   }, [id, router]);
 
   const toggleChip = (chip: string) =>
@@ -75,15 +88,25 @@ export default function LeadDetailScreen() {
   const save = async () => {
     if (!id) return;
     const followup = [...chips, extraPlan.trim()].filter(Boolean).join(CHIP_SEPARATOR);
-    await updateLead(id, {
+    const patch: LeadPatch = {
       name: name.trim() || null,
       rating: rating || null,
       note: note.trim() || null,
       followup: followup || null,
       status,
-    });
-    bumpLeadsVersion();
-    pushSoon();
+    };
+    if (serverMode) {
+      const ok = await updateServerLead(id, patch);
+      if (!ok) {
+        ToastAndroid.show('ذخیره روی سرور ناموفق بود؛ اینترنت را بررسی کنید', ToastAndroid.LONG);
+        return;
+      }
+      void serverStore.refresh();
+    } else {
+      await updateLead(id, patch);
+      bumpLeadsVersion();
+      pushSoon();
+    }
     ToastAndroid.show('ذخیره شد', ToastAndroid.SHORT);
     router.back();
   };
@@ -113,7 +136,10 @@ export default function LeadDetailScreen() {
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.phone}>{ltrIsolate(formatPhoneFa(phone))}</Text>
-            <Text style={styles.date}>ثبت: {formatFaDateTime(createdAt)}</Text>
+            <Text style={styles.date}>
+              ثبت: {formatFaDateTime(createdAt)}
+              {serverMode ? ' • سرور' : ''}
+            </Text>
           </View>
           <BigButton label="بازگشت" variant="ghost" onPress={() => router.back()} />
         </View>
@@ -182,7 +208,7 @@ export default function LeadDetailScreen() {
 
         <View style={styles.actions}>
           <BigButton label="ذخیره" size="lg" onPress={save} style={styles.saveButton} />
-          <BigButton label="حذف" variant="danger" onPress={remove} />
+          {!serverMode ? <BigButton label="حذف" variant="danger" onPress={remove} /> : null}
         </View>
       </ScrollView>
     </View>

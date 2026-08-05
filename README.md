@@ -19,6 +19,10 @@ follow-ups, show QR business cards, and export/backup everything.
   note) from any phone browser. Session cookie lasts 30 days. Web edits live on
   the server only; the tablet keeps its own copy (tablet re-edits win on later
   sync).
+- Employee mode (حالت همکار): switch in app Settings; the customers tab then
+  reads/edits the shared server list via the admin API (Bearer = sync token),
+  30 s auto-refresh, delete hidden. Kiosk capture stays offline-first local on
+  every device regardless.
 - SMS verification (کلوپ مشتریان): Kavenegar verify-lookup, configured in the
   app's Settings tab (API key + template). Unconfigured or failed SMS → the
   kiosk skips verification and still saves the number.

@@ -172,6 +172,10 @@ function validSession(cookieHeader) {
 }
 
 function adminAuth(req, res, next) {
+  // Employee app uses the same bearer token as sync; browsers use the cookie.
+  const header = req.get('authorization') || '';
+  const bearer = header.startsWith('Bearer ') ? header.slice(7) : null;
+  if (tokenMatches(bearer)) return next();
   if (ADMIN_PASSWORD && validSession(req.headers.cookie)) return next();
   res.status(401).json({ ok: false, error: 'unauthorized' });
 }
