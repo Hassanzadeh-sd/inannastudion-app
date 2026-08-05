@@ -45,3 +45,5 @@ example
 # leadsync server secret (lives on the VPS in /etc/leadsync.env)
 server/.token
 server/node_modules/
+
+server/.admin-password

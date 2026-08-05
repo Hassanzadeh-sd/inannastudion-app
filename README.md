@@ -12,6 +12,16 @@ follow-ups, show QR business cards, and export/backup everything.
   exposed at `https://hassanzadeh.tech/lead-api` (Cloudflare TLS, HTTP origin).
   Bearer token: on the VPS in `/etc/leadsync.env`; local copy in `server/.token`
   (gitignored). Server DB: `/var/lib/leadsync/leads.db`.
+- Employee web panel: `https://hassanzadeh.tech/lead-api/admin`, mobile-friendly
+  Persian page where employees log in with a shared password (VPS
+  `/etc/leadsync.env` ADMIN_PASSWORD; local copy `server/.admin-password`,
+  gitignored) and complete customer info (name, rating, status, follow-up,
+  note) from any phone browser. Session cookie lasts 30 days. Web edits live on
+  the server only; the tablet keeps its own copy (tablet re-edits win on later
+  sync).
+- SMS verification (کلوپ مشتریان): Kavenegar verify-lookup, configured in the
+  app's Settings tab (API key + template). Unconfigured or failed SMS → the
+  kiosk skips verification and still saves the number.
 
 ## Before the exhibition
 
