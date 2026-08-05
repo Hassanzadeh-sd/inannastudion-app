@@ -9,10 +9,10 @@ follow-ups, show QR business cards, and export/backup everything.
 - App: Expo + expo-router, source in `src/` (routes in `src/app/`).
 - `server/`: tiny Express + better-sqlite3 push-backup API, deployed on
   `personal_qrcow_cloudzy_02` at `/opt/leadsync` (systemd unit `leadsync`),
-  exposed at `https://hassanzadeh.tech/lead-api` (Cloudflare TLS, HTTP origin).
+  exposed at `https://opendevtalk.com/lead-api` (Cloudflare TLS, HTTP origin).
   Bearer token: on the VPS in `/etc/leadsync.env`; local copy in `server/.token`
   (gitignored). Server DB: `/var/lib/leadsync/leads.db`.
-- Employee web panel: `https://hassanzadeh.tech/lead-api/admin`, mobile-friendly
+- Employee web panel: `https://opendevtalk.com/lead-api/admin`, mobile-friendly
   Persian page where employees log in with a shared password (VPS
   `/etc/leadsync.env` ADMIN_PASSWORD; local copy `server/.admin-password`,
   gitignored) and complete customer info (name, rating, status, follow-up,
@@ -28,7 +28,7 @@ follow-ups, show QR business cards, and export/backup everything.
 1. Edit `src/constants/team.ts`: real names, roles, numbers, email for the QR
    business cards and team directory.
 2. First app launch asks to set a 4-digit staff PIN.
-3. In Settings tab enter server URL `https://hassanzadeh.tech/lead-api` and the
+3. In Settings tab enter server URL `https://opendevtalk.com/lead-api` and the
    token from `server/.token`, then tap همگام‌سازی to verify.
 4. Replace `assets/images/` icon/splash with real brand art when available.
 
@@ -79,7 +79,7 @@ ssh personal_qrcow_cloudzy_02
 systemctl status leadsync            # service
 curl -s localhost:8787/health        # local health
 # download all leads as Excel-friendly CSV (browser works too, ?token=…):
-curl -H "Authorization: Bearer $TOKEN" https://hassanzadeh.tech/lead-api/leads.csv
+curl -H "Authorization: Bearer $TOKEN" https://opendevtalk.com/lead-api/leads.csv
 ```
 
 Redeploy after editing `server/src/server.js`:
