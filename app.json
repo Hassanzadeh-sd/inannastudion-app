@@ -1,17 +1,23 @@
 {
   "expo": {
     "name": "استودیو اینانا",
-    "slug": "inanna-studio",
+    "slug": "inannastudio",
     "version": "1.0.0",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "inannastudio",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0E0A18",
-    "platforms": ["android"],
+    "platforms": [
+      "android"
+    ],
     "extra": {
       "supportsRTL": true,
-      "forcesRTL": true
+      "forcesRTL": true,
+      "router": {},
+      "eas": {
+        "projectId": "a5990e27-0d4b-4715-87e1-0c31ebe4babc"
+      }
     },
     "android": {
       "package": "com.inannastudio.leads",
@@ -42,6 +48,7 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "owner": "hassanzadehsds-team"
   }
 }

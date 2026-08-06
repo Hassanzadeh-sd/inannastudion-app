@@ -1,5 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { colors, spacing } from '../theme';
+import { toPersianDigits } from '../lib/digits';
 
 interface Props {
   value: number | null;
@@ -17,17 +19,16 @@ export function StarRating({ value, onChange, size = 40 }: Props) {
             key={star}
             disabled={!onChange}
             onPress={() => onChange?.(star === value ? 0 : star)}
-            hitSlop={8}
+            hitSlop={10}
+            accessibilityRole="button"
+            accessibilityLabel={`امتیاز ${toPersianDigits(star)}`}
+            style={({ pressed }) => (pressed ? styles.pressed : null)}
           >
-            <Text
-              style={{
-                fontSize: size,
-                lineHeight: size * 1.25,
-                color: filled ? colors.star : colors.starOff,
-              }}
-            >
-              ★
-            </Text>
+            <MaterialCommunityIcons
+              name={filled ? 'star' : 'star-outline'}
+              size={size}
+              color={filled ? colors.star : colors.starOff}
+            />
           </Pressable>
         );
       })}
@@ -37,4 +38,5 @@ export function StarRating({ value, onChange, size = 40 }: Props) {
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: spacing.sm, alignItems: 'center' },
+  pressed: { opacity: 0.7, transform: [{ scale: 0.92 }] },
 });

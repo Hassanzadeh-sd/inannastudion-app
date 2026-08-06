@@ -29,8 +29,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
+    minHeight: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  small: { paddingVertical: 4, paddingHorizontal: 12 },
+  small: { paddingVertical: 4, paddingHorizontal: 12, minHeight: 44 },
   selected: {
     backgroundColor: colors.accent,
     borderColor: colors.accent2,

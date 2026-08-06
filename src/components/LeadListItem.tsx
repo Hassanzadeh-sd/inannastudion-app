@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { colors, fonts, radius, spacing } from '../theme';
 import type { Lead, LeadStatus } from '../db/leads.repo';
 import { formatFaDateTime, ltrIsolate } from '../lib/digits';
@@ -45,10 +46,16 @@ export const LeadListItem = memo(function LeadListItem({ lead, onPress }: Props)
         <Text style={styles.phone}>{ltrIsolate(formatPhoneFa(lead.phone))}</Text>
         <Text style={styles.date}>{formatFaDateTime(lead.created_at)}</Text>
       </View>
-      <Text style={styles.stars}>
-        <Text style={{ color: colors.star }}>{'★'.repeat(lead.rating ?? 0)}</Text>
-        <Text style={{ color: colors.starOff }}>{'★'.repeat(5 - (lead.rating ?? 0))}</Text>
-      </Text>
+      <View style={styles.stars}>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <MaterialCommunityIcons
+            key={star}
+            name={star <= (lead.rating ?? 0) ? 'star' : 'star-outline'}
+            size={22}
+            color={star <= (lead.rating ?? 0) ? colors.star : colors.starOff}
+          />
+        ))}
+      </View>
     </Pressable>
   );
 });
@@ -84,5 +91,5 @@ const styles = StyleSheet.create({
   member: { fontFamily: fonts.medium, fontSize: 13, color: colors.success },
   phone: { fontFamily: fonts.medium, fontSize: 18, color: colors.accentSoft },
   date: { fontFamily: fonts.regular, fontSize: 13, color: colors.textFaint },
-  stars: { fontSize: 24, letterSpacing: 2 },
+  stars: { flexDirection: 'row', gap: 2 },
 });

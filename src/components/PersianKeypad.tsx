@@ -1,4 +1,5 @@
 import { I18nManager, Pressable, StyleSheet, Text, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { colors, fonts, radius, spacing } from '../theme';
 import { toPersianDigits } from '../lib/digits';
 
@@ -49,6 +50,8 @@ export function PersianKeypad({ onDigit, onBackspace, onClear, keyHeight = 88 }:
         {digitKey('0')}
         <Pressable
           onPress={onBackspace}
+          accessibilityRole="button"
+          accessibilityLabel="پاک کردن آخرین رقم"
           style={({ pressed }) => [
             styles.key,
             styles.keyMuted,
@@ -56,7 +59,7 @@ export function PersianKeypad({ onDigit, onBackspace, onClear, keyHeight = 88 }:
             pressed && styles.keyPressed,
           ]}
         >
-          <Text style={[styles.digit, styles.backspace]}>⌫</Text>
+          <MaterialCommunityIcons name="backspace-outline" size={32} color={colors.textMuted} />
         </Pressable>
       </View>
     </View>
@@ -78,6 +81,5 @@ const styles = StyleSheet.create({
   keyHidden: { opacity: 0 },
   keyPressed: { backgroundColor: colors.accent },
   digit: { fontFamily: fonts.bold, fontSize: 36, color: colors.text },
-  backspace: { fontSize: 30, color: colors.textMuted },
   action: { fontFamily: fonts.medium, fontSize: 18, color: colors.textMuted },
 });
