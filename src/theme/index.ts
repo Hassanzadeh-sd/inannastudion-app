@@ -1,31 +1,36 @@
 /**
- * Design tokens for استودیو اینانا — "fantasy" edition.
- * Deep space-violet surfaces, gold→magenta gradient accents, sharp corners.
+ * Design tokens for استودیو اینانا — brand edition.
+ * Warm cream surfaces with olive green and campfire amber, matching the
+ * Inanna Studio camping logo (cream / olive / amber / charcoal).
  */
 export const colors = {
-  bg: '#0E0A18',
-  surface: '#1B1329',
-  surfaceRaised: '#271A3D',
-  border: '#43306B',
-  accent: '#F3C14F',
-  accentSoft: '#F7D68A',
-  accent2: '#E8579B',
-  violet: '#9D6BFF',
-  onAccent: '#241335',
-  text: '#F7F2FF',
-  textMuted: '#B3A6CF',
-  textFaint: '#786C96',
-  success: '#5FD68B',
-  danger: '#FF6B6B',
-  star: '#F3C14F',
-  starOff: '#4A3A6B',
+  bg: '#F7F4EC',
+  surface: '#FFFFFF',
+  surfaceRaised: '#FBF8F0',
+  border: '#E0D8C3',
+  /** Amber fill (sun/fire). Always pair with `onAccent` text. */
+  accent: '#E9A13B',
+  /** Bronze: accent-toned TEXT/icons on light backgrounds (4.5:1+). */
+  accentSoft: '#A66A16',
+  /** Fire orange: gradient end, selected borders. */
+  accent2: '#D97B2C',
+  /** Olive green from the logo's forest/tents. */
+  secondary: '#5F6B3A',
+  onAccent: '#2C2417',
+  text: '#2B2B22',
+  textMuted: '#6E6A58',
+  textFaint: '#9C977F',
+  success: '#4F7D3A',
+  danger: '#C24A33',
+  star: '#E9A13B',
+  starOff: '#DDD5BF',
 } as const;
 
 /** Gradient stops (start → end) used by primary buttons and backdrops. */
 export const gradients = {
-  button: ['#F3C14F', '#E8579B'] as const,
-  backdrop: ['#221238', '#0E0A18'] as const,
-  card: ['#2A1C44', '#1B1329'] as const,
+  button: ['#F0AC45', '#DC8130'] as const,
+  backdrop: ['#FBF8F1', '#F1EBDB'] as const,
+  card: ['#FFFFFF', '#FAF6EC'] as const,
 };
 
 export const fonts = {

@@ -84,16 +84,16 @@ const styles = StyleSheet.create({
   },
   shadow: {
     borderRadius: radius.sm,
-    elevation: 6,
-    shadowColor: '#E8579B',
-    shadowOpacity: 0.45,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    shadowColor: '#B4711A',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
   },
   ghost: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: colors.violet,
+    borderColor: colors.secondary,
   },
   dangerOutline: {
     backgroundColor: 'transparent',

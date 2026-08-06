@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
   idle: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
   brandMark: { fontSize: 64, color: colors.accent },
   brandTitle: { fontFamily: fonts.black, fontSize: 72, color: colors.text },
-  clubTitle: { fontFamily: fonts.medium, fontSize: 30, color: colors.violet },
+  clubTitle: { fontFamily: fonts.medium, fontSize: 30, color: colors.secondary },
   divider: { width: 140, height: 2, backgroundColor: colors.accent2, marginVertical: spacing.md },
   idlePrompt: { fontFamily: fonts.medium, fontSize: 26, color: colors.textMuted },
   split: {

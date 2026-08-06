@@ -125,7 +125,7 @@ export default function PinScreen() {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(10, 7, 15, 0.85)',
+    backgroundColor: 'rgba(44, 40, 28, 0.55)',
     alignItems: 'center',
     justifyContent: 'center',
   },

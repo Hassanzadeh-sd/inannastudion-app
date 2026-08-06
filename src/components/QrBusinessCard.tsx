@@ -35,7 +35,7 @@ export function QrBusinessCard({ person, width }: Props) {
             size={280}
             ecl="M"
             backgroundColor="#FFFFFF"
-            color="#17121F"
+            color="#2B2B22"
           />
         </View>
         <Text style={styles.hint}>برای ذخیره مخاطب، کد را با دوربین گوشی اسکن کنید</Text>

@@ -182,42 +182,42 @@ function adminAuth(req, res, next) {
 
 const PAGE_STYLE = `
   * { box-sizing: border-box; margin: 0; }
-  body { background: #0E0A18; color: #F7F2FF; font-family: Vazirmatn, Tahoma, sans-serif;
+  body { background: #F7F4EC; color: #2B2B22; font-family: Vazirmatn, Tahoma, sans-serif;
          min-height: 100vh; padding: 16px; -webkit-tap-highlight-color: transparent; }
   .wrap { max-width: 640px; margin: 0 auto; }
-  h1 { font-size: 22px; color: #F3C14F; margin-bottom: 4px; }
-  .sub { color: #B3A6CF; font-size: 13px; margin-bottom: 16px; }
-  .card { background: #1B1329; border: 1px solid #43306B; border-radius: 8px;
+  h1 { font-size: 22px; color: #A66A16; margin-bottom: 4px; }
+  .sub { color: #6E6A58; font-size: 13px; margin-bottom: 16px; }
+  .card { background: #FFFFFF; border: 1px solid #E0D8C3; border-radius: 8px;
           padding: 14px; margin-bottom: 10px; }
   .btn { display: inline-flex; align-items: center; justify-content: center;
          min-height: 44px; border: 0; border-radius: 4px; cursor: pointer;
          font-family: inherit; font-size: 16px; font-weight: 700; padding: 10px 18px;
-         background: linear-gradient(120deg, #F3C14F, #E8579B); color: #241335;
+         background: linear-gradient(120deg, #F0AC45, #DC8130); color: #2C2417;
          touch-action: manipulation; transition: opacity 200ms ease, transform 150ms ease; }
   .btn:active { transform: scale(0.97); }
   .btn:disabled { opacity: 0.5; cursor: default; }
-  .btn.ghost { background: none; border: 1px solid #9D6BFF; color: #F7F2FF; font-weight: 500; }
-  .btn.on { background: #F3C14F; border-color: #F3C14F; color: #241335; }
-  input, textarea, select { width: 100%; background: #271A3D; color: #F7F2FF;
-    border: 1px solid #43306B; border-radius: 6px; padding: 12px; font-family: inherit;
+  .btn.ghost { background: none; border: 1px solid #5F6B3A; color: #2B2B22; font-weight: 500; }
+  .btn.on { background: #E9A13B; border-color: #E9A13B; color: #2C2417; }
+  input, textarea, select { width: 100%; background: #FFFFFF; color: #2B2B22;
+    border: 1px solid #E0D8C3; border-radius: 6px; padding: 12px; font-family: inherit;
     font-size: 16px; min-height: 44px; margin: 4px 0 10px; }
   .btn:focus-visible, input:focus-visible, textarea:focus-visible, a:focus-visible,
-  .starpick button:focus-visible { outline: 2px solid #9D6BFF; outline-offset: 2px; }
+  .starpick button:focus-visible { outline: 2px solid #5F6B3A; outline-offset: 2px; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-  .phone { direction: ltr; unicode-bidi: isolate; color: #F7D68A; font-weight: 700;
+  .phone { direction: ltr; unicode-bidi: isolate; color: #A66A16; font-weight: 700;
            font-size: 18px; font-variant-numeric: tabular-nums; }
-  .muted { color: #9A8FB5; font-size: 13px; }
+  .muted { color: #9C977F; font-size: 13px; }
   .badge { font-size: 13px; border-radius: 4px; padding: 2px 8px; }
-  .badge.noname { border: 1px solid #FF6B6B; color: #FF8585; }
-  .badge.member { color: #5FD68B; }
-  .stars { color: #F3C14F; letter-spacing: 2px; font-size: 18px; }
-  .stars .off { color: #4A3A6B; }
+  .badge.noname { border: 1px solid #C24A33; color: #C24A33; }
+  .badge.member { color: #4F7D3A; }
+  .stars { color: #E9A13B; letter-spacing: 2px; font-size: 18px; }
+  .stars .off { color: #DDD5BF; }
   .starpick button { background: none; border: 0; font-size: 30px; cursor: pointer;
-    color: #4A3A6B; min-width: 44px; min-height: 44px; touch-action: manipulation; }
-  .starpick button.on { color: #F3C14F; }
-  .err { color: #FF6B6B; margin-bottom: 12px; }
+    color: #DDD5BF; min-width: 44px; min-height: 44px; touch-action: manipulation; }
+  .starpick button.on { color: #E9A13B; }
+  .err { color: #C24A33; margin-bottom: 12px; }
   .top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px; }
-  a { color: #9D6BFF; }
+  a { color: #5F6B3A; }
   @media (prefers-reduced-motion: reduce) {
     .btn, .btn:active { transition: none; transform: none; }
   }
@@ -227,7 +227,7 @@ const LOGIN_HTML = `<!doctype html><html dir="rtl" lang="fa"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ورود کارکنان — استودیو اینانا</title><style>${PAGE_STYLE}</style></head>
 <body><div class="wrap" style="max-width:380px;margin-top:12vh;text-align:center">
-<div style="font-size:40px;color:#F3C14F">✦</div>
+<div style="font-size:40px;color:#E9A13B">✦</div>
 <h1>استودیو اینانا</h1><div class="sub">پنل کارکنان — کلوپ مشتریان</div>
 <div class="card" style="text-align:right">
 <div id="err" class="err" role="alert" style="display:none">رمز اشتباه است؛ دوباره تلاش کنید</div>

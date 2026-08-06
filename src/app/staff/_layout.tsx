@@ -36,7 +36,7 @@ export default function StaffLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: colors.accent,
+          tabBarActiveTintColor: colors.accentSoft,
           tabBarInactiveTintColor: colors.textMuted,
           tabBarStyle: {
             backgroundColor: colors.surface,
