@@ -225,10 +225,10 @@ const PAGE_STYLE = `
 
 const LOGIN_HTML = `<!doctype html><html dir="rtl" lang="fa"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ورود کارکنان — استودیو اینانا</title><style>${PAGE_STYLE}</style></head>
+<title>ورود کارکنان — استادیو اینانا</title><style>${PAGE_STYLE}</style></head>
 <body><div class="wrap" style="max-width:380px;margin-top:12vh;text-align:center">
 <div style="font-size:40px;color:#E9A13B">✦</div>
-<h1>استودیو اینانا</h1><div class="sub">پنل کارکنان — کلوپ مشتریان</div>
+<h1>استادیو اینانا</h1><div class="sub">پنل کارکنان — کلوپ مشتریان</div>
 <div class="card" style="text-align:right">
 <div id="err" class="err" role="alert" style="display:none">رمز اشتباه است؛ دوباره تلاش کنید</div>
 <form method="post" action="${BASE_PATH}/admin/login">
@@ -241,7 +241,7 @@ const LOGIN_HTML = `<!doctype html><html dir="rtl" lang="fa"><head>
 
 const PANEL_HTML = `<!doctype html><html dir="rtl" lang="fa"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>مشتریان — استودیو اینانا</title><style>${PAGE_STYLE}</style></head>
+<title>مشتریان — استادیو اینانا</title><style>${PAGE_STYLE}</style></head>
 <body><div class="wrap">
 <div class="top"><div><h1>ثبت اطلاعات مشتریان</h1><div class="sub" id="count" aria-live="polite">…</div></div>
 <a href="${BASE_PATH}/admin/logout">خروج</a></div>

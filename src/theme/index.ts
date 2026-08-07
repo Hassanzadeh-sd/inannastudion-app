@@ -1,5 +1,5 @@
 /**
- * Design tokens for استودیو اینانا — brand edition.
+ * Design tokens for استادیو اینانا — brand edition.
  * Warm cream surfaces with olive green and campfire amber, matching the
  * Inanna Studio camping logo (cream / olive / amber / charcoal).
  */

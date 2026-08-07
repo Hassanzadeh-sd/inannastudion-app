@@ -1,6 +1,6 @@
-# استودیو اینانا — Exhibition Lead App
+# استادیو اینانا — Exhibition Lead App
 
-Persian RTL Android tablet app (Expo SDK 57) for the استودیو اینانا exhibition booth:
+Persian RTL Android tablet app (Expo SDK 57) for the استادیو اینانا exhibition booth:
 visitors enter their mobile number on a kiosk screen; staff rate leads 1-5, plan
 follow-ups, show QR business cards, and export/backup everything.
 

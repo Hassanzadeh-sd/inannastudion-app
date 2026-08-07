@@ -10,6 +10,7 @@ import {
 import { useFocusEffect, useRouter } from 'expo-router';
 import * as NavigationBar from 'expo-navigation-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { colors, fonts, gradients, radius, spacing } from '../theme';
 import { PersianKeypad } from '../components/PersianKeypad';
 import { PinDots } from '../components/PinDots';
@@ -168,8 +169,11 @@ export default function KioskScreen() {
     <LinearGradient colors={gradients.backdrop} style={styles.root}>
       {phase === 'idle' && (
         <Pressable style={styles.idle} onPress={() => setPhase('phone')}>
-          <Text style={styles.brandMark}>✦</Text>
-          <Text style={styles.brandTitle}>استودیو اینانا</Text>
+          <Image
+            source={require('../../assets/images/logo-full.png')}
+            style={styles.logo}
+            contentFit="contain"
+          />
           <Text style={styles.clubTitle}>کلوپ مشتریان اینانا</Text>
           <View style={styles.divider} />
           <Text style={styles.idlePrompt}>برای عضویت، صفحه را لمس کنید</Text>
@@ -181,8 +185,8 @@ export default function KioskScreen() {
           <View style={styles.pane}>
             <Text style={styles.paneTitle}>شماره موبایل خود را وارد کنید</Text>
             <View style={styles.phoneDisplay}>
-              <Text style={styles.phoneText}>
-                {phone ? ltrIsolate(formatPhoneFa(phone)) : 'مثال: ۰۹۱۲ ۳۴۵ ۶۷۸۹'}
+              <Text style={[styles.phoneText, !phone && styles.phonePlaceholder]}>
+                {phone ? ltrIsolate(formatPhoneFa(phone)) : ltrIsolate('۰۹۱۲ ۳۴۵ ۶۷۸۹')}
               </Text>
             </View>
             <BigButton
@@ -238,7 +242,9 @@ export default function KioskScreen() {
       )}
 
       {phase === 'name' && (
-        <View style={styles.center}>
+        // Top-aligned so the soft keyboard (bottom half in landscape) never
+        // covers the input; fullscreen extract mode is disabled on the input.
+        <View style={styles.nameWrap}>
           <Text style={styles.paneTitle}>نام شما (اختیاری)</Text>
           <TextInput
             style={styles.nameInput}
@@ -247,21 +253,36 @@ export default function KioskScreen() {
             placeholder="نام و نام خانوادگی"
             placeholderTextColor={colors.textFaint}
             autoFocus
+            disableFullscreenUI
             maxLength={60}
             onSubmitEditing={submitName}
             returnKeyType="done"
           />
           <View style={styles.nameActions}>
             <BigButton label="ثبت نام" size="lg" onPress={submitName} disabled={!name.trim()} />
-            <BigButton label="رد شدن" variant="ghost" size="lg" onPress={() => setPhase('thanks')} />
+            <BigButton
+              label="رد شدن"
+              variant="ghost"
+              size="lg"
+              onPress={() => {
+                setName('');
+                setPhase('thanks');
+              }}
+            />
           </View>
         </View>
       )}
 
       {phase === 'thanks' && (
         <View style={styles.center}>
-          <Text style={styles.thanksMark}>✦</Text>
-          <Text style={styles.thanksTitle}>متشکریم!</Text>
+          <Image
+            source={require('../../assets/images/logo-emblem.png')}
+            style={styles.thanksEmblem}
+            contentFit="contain"
+          />
+          <Text style={styles.thanksTitle}>
+            {name.trim() ? `${name.trim()} عزیز` : 'متشکریم!'}
+          </Text>
           <Text style={styles.thanksBody}>به کلوپ مشتریان اینانا خوش آمدید</Text>
         </View>
       )}
@@ -275,8 +296,7 @@ export default function KioskScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   idle: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
-  brandMark: { fontSize: 64, color: colors.accent },
-  brandTitle: { fontFamily: fonts.black, fontSize: 72, color: colors.text },
+  logo: { width: '58%', aspectRatio: 3 },
   clubTitle: { fontFamily: fonts.medium, fontSize: 30, color: colors.secondary },
   divider: { width: 140, height: 2, backgroundColor: colors.accent2, marginVertical: spacing.md },
   idlePrompt: { fontFamily: fonts.medium, fontSize: 26, color: colors.textMuted },
@@ -311,10 +331,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   phoneText: { fontFamily: fonts.bold, fontSize: 40, color: colors.accentSoft },
+  phonePlaceholder: { color: colors.textFaint },
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    gap: spacing.lg,
+    paddingHorizontal: spacing.xxl,
+  },
+  nameWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: spacing.xl,
     gap: spacing.lg,
     paddingHorizontal: spacing.xxl,
   },
@@ -332,7 +361,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   nameActions: { flexDirection: 'row', gap: spacing.md },
-  thanksMark: { fontSize: 80, color: colors.accent },
+  thanksEmblem: { width: 180, height: 130 },
   thanksTitle: { fontFamily: fonts.black, fontSize: 56, color: colors.text },
   thanksBody: { fontFamily: fonts.medium, fontSize: 30, color: colors.accentSoft },
   hotspot: {

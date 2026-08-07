@@ -108,6 +108,7 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>پشتیبان‌گیری روی سرور</Text>
             <Text style={styles.label}>آدرس سرور</Text>
             <TextInput
+              disableFullscreenUI
               style={styles.ltrInput}
               value={url}
               onChangeText={setUrl}
@@ -119,6 +120,7 @@ export default function SettingsScreen() {
             />
             <Text style={styles.label}>توکن دسترسی</Text>
             <TextInput
+              disableFullscreenUI
               style={styles.ltrInput}
               value={token}
               onChangeText={setToken}
@@ -163,6 +165,7 @@ export default function SettingsScreen() {
             <Text style={styles.sectionTitle}>کد تأیید پیامکی (کلوپ مشتریان)</Text>
             <Text style={styles.label}>کلید API کاوه‌نگار</Text>
             <TextInput
+              disableFullscreenUI
               style={styles.ltrInput}
               value={smsKey}
               onChangeText={setSmsKey}
@@ -173,6 +176,7 @@ export default function SettingsScreen() {
             />
             <Text style={styles.label}>نام قالب تأیید (template)</Text>
             <TextInput
+              disableFullscreenUI
               style={styles.ltrInput}
               value={smsTemplate}
               onChangeText={setSmsTemplate}

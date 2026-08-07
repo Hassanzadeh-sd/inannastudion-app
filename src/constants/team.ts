@@ -1,5 +1,5 @@
 /**
- * استودیو اینانا team: business cards + directory.
+ * استادیو اینانا team: business cards + directory.
  * TODO(saji): replace placeholder people with the real team before the
  * exhibition. `phones[0]` is the primary number shown on the QR card.
  */
@@ -18,13 +18,13 @@ export interface Person {
   hasCard: boolean;
 }
 
-export const COMPANY_NAME = 'استودیو اینانا';
+export const COMPANY_NAME = 'استادیو اینانا';
 export const COMPANY_NAME_LATIN = 'Inanna Studio';
 
 export const TEAM: Person[] = [
   {
     id: 'owner',
-    name: 'مدیر استودیو اینانا',
+    name: 'مدیر استادیو اینانا',
     latinName: 'Inanna Studio',
     role: 'مدیریت',
     company: COMPANY_NAME,

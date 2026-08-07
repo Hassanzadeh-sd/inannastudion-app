@@ -24,7 +24,7 @@ async function callPhone(phone: string) {
 export default function TeamScreen() {
   return (
     <View style={styles.root}>
-      <StaffHeader title="تیم استودیو اینانا" subtitle="شماره و اطلاعات همکاران" />
+      <StaffHeader title="تیم استادیو اینانا" subtitle="شماره و اطلاعات همکاران" />
       <ScrollView contentContainerStyle={styles.list}>
         {TEAM.map((person) => (
           <View key={person.id} style={styles.card}>

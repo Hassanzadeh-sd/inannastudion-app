@@ -148,6 +148,7 @@ export default function LeadDetailScreen() {
           <View style={styles.col}>
             <Text style={styles.label}>نام</Text>
             <TextInput
+              disableFullscreenUI
               style={styles.input}
               value={name}
               onChangeText={setName}
@@ -185,6 +186,7 @@ export default function LeadDetailScreen() {
               ))}
             </View>
             <TextInput
+              disableFullscreenUI
               style={styles.input}
               value={extraPlan}
               onChangeText={setExtraPlan}
@@ -195,6 +197,7 @@ export default function LeadDetailScreen() {
 
             <Text style={styles.label}>یادداشت</Text>
             <TextInput
+              disableFullscreenUI
               style={[styles.input, styles.noteInput]}
               value={note}
               onChangeText={setNote}
