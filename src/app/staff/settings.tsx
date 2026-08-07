@@ -17,6 +17,7 @@ import { pushPending } from '../../lib/sync';
 import { useSyncStatus } from '../../store/sync-status';
 import { shareCsv, shareXlsx } from '../../lib/exporter';
 import { formatFaDateTime, toPersianDigits } from '../../lib/digits';
+import { useIsCompact } from '../../hooks/use-compact';
 
 const PHASE_FA: Record<string, string> = {
   idle: 'در انتظار',
@@ -28,6 +29,7 @@ const PHASE_FA: Record<string, string> = {
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const compact = useIsCompact();
   const sync = useSyncStatus();
   const [url, setUrl] = useState('');
   const [token, setToken] = useState('');
@@ -103,7 +105,7 @@ export default function SettingsScreen() {
     <View style={styles.root}>
       <StaffHeader title="تنظیمات" />
       <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.columns}>
+        <View style={[styles.columns, compact && styles.columnsCompact]}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>پشتیبان‌گیری روی سرور</Text>
             <Text style={styles.label}>آدرس سرور</Text>
@@ -219,6 +221,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   scroll: { padding: spacing.lg },
   columns: { flexDirection: 'row', gap: spacing.xl },
+  columnsCompact: { flexDirection: 'column', gap: spacing.sm },
   section: { flex: 1, gap: spacing.sm },
   sectionTitle: {
     fontFamily: fonts.black,

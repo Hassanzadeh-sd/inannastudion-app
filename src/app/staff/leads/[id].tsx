@@ -30,6 +30,7 @@ import { FOLLOWUP_CHIPS } from '../../../constants/team';
 import { formatFaDateTime, ltrIsolate } from '../../../lib/digits';
 import { formatPhoneFa } from '../../../lib/phone';
 import { pushSoon } from '../../../lib/sync';
+import { useIsCompact } from '../../../hooks/use-compact';
 
 const CHIP_SEPARATOR = '، ';
 
@@ -44,6 +45,7 @@ function splitFollowup(followup: string | null): { chips: string[]; extra: strin
 export default function LeadDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const compact = useIsCompact();
   const serverStore = useServerLeads();
 
   const [serverMode, setServerMode] = useState(false);
@@ -144,7 +146,7 @@ export default function LeadDetailScreen() {
           <BigButton label="بازگشت" variant="ghost" onPress={() => router.back()} />
         </View>
 
-        <View style={styles.columns}>
+        <View style={[styles.columns, compact && styles.columnsCompact]}>
           <View style={styles.col}>
             <Text style={styles.label}>نام</Text>
             <TextInput
@@ -229,6 +231,7 @@ const styles = StyleSheet.create({
   phone: { fontFamily: fonts.black, fontSize: 34, color: colors.accentSoft },
   date: { fontFamily: fonts.regular, fontSize: 14, color: colors.textFaint },
   columns: { flexDirection: 'row', gap: spacing.xl },
+  columnsCompact: { flexDirection: 'column', gap: spacing.md },
   col: { flex: 1, gap: spacing.sm },
   label: {
     fontFamily: fonts.bold,

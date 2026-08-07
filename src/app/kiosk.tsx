@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   BackHandler,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -21,8 +22,34 @@ import { isValidIranMobile, formatPhoneFa } from '../lib/phone';
 import { ltrIsolate, toPersianDigits } from '../lib/digits';
 import { pushSoon } from '../lib/sync';
 import { generateOtpCode, getOtpConfig, sendOtpSms } from '../lib/otp';
+import { useIsCompact } from '../hooks/use-compact';
 
 type Phase = 'idle' | 'phone' | 'verify' | 'name' | 'thanks';
+
+/**
+ * Wide screens (tablet): two panes side by side. Compact screens (employee
+ * phones, portrait): a single scrollable column, keypad under the content.
+ */
+function withKioskLayout(
+  compact: boolean,
+  content: React.ReactNode,
+  keypad: React.ReactNode,
+) {
+  if (compact) {
+    return (
+      <ScrollView contentContainerStyle={styles.compactScroll}>
+        {content}
+        {keypad}
+      </ScrollView>
+    );
+  }
+  return (
+    <View style={styles.split}>
+      <View style={styles.pane}>{content}</View>
+      <View style={styles.pane}>{keypad}</View>
+    </View>
+  );
+}
 
 const NAME_AUTOSKIP_MS = 20_000;
 const THANKS_RESET_MS = 5_000;
@@ -35,6 +62,7 @@ const HOTSPOT_WINDOW_MS = 3_000;
 
 export default function KioskScreen() {
   const router = useRouter();
+  const compact = useIsCompact();
   const [phase, setPhase] = useState<Phase>('idle');
   const [phone, setPhone] = useState('');
   const [name, setName] = useState('');
@@ -171,7 +199,7 @@ export default function KioskScreen() {
         <Pressable style={styles.idle} onPress={() => setPhase('phone')}>
           <Image
             source={require('../../assets/images/logo-full.png')}
-            style={styles.logo}
+            style={[styles.logo, compact && styles.logoCompact]}
             contentFit="contain"
           />
           <Text style={styles.clubTitle}>کلوپ مشتریان اینانا</Text>
@@ -180,9 +208,10 @@ export default function KioskScreen() {
         </Pressable>
       )}
 
-      {phase === 'phone' && (
-        <View style={styles.split}>
-          <View style={styles.pane}>
+      {phase === 'phone' &&
+        withKioskLayout(
+          compact,
+          <>
             <Text style={styles.paneTitle}>شماره موبایل خود را وارد کنید</Text>
             <View style={styles.phoneDisplay}>
               <Text style={[styles.phoneText, !phone && styles.phonePlaceholder]}>
@@ -196,21 +225,19 @@ export default function KioskScreen() {
               onPress={submitPhone}
             />
             <BigButton label="انصراف" variant="ghost" onPress={reset} />
-          </View>
-          <View style={styles.pane}>
-            <PersianKeypad
-              keyHeight={92}
-              onDigit={(d) => setPhone((p) => (p.length < 11 ? p + d : p))}
-              onBackspace={() => setPhone((p) => p.slice(0, -1))}
-              onClear={() => setPhone('')}
-            />
-          </View>
-        </View>
-      )}
+          </>,
+          <PersianKeypad
+            keyHeight={compact ? 60 : 92}
+            onDigit={(d) => setPhone((p) => (p.length < 11 ? p + d : p))}
+            onBackspace={() => setPhone((p) => p.slice(0, -1))}
+            onClear={() => setPhone('')}
+          />,
+        )}
 
-      {phase === 'verify' && (
-        <View style={styles.split}>
-          <View style={styles.pane}>
+      {phase === 'verify' &&
+        withKioskLayout(
+          compact,
+          <>
             <Text style={styles.paneTitle}>کد تأیید پیامک‌شده را وارد کنید</Text>
             <Text style={styles.verifySub}>
               کد به شماره {ltrIsolate(formatPhoneFa(phone))} ارسال شد
@@ -230,16 +257,13 @@ export default function KioskScreen() {
               />
               <BigButton label="رد شدن" variant="ghost" onPress={() => setPhase('name')} />
             </View>
-          </View>
-          <View style={styles.pane}>
-            <PersianKeypad
-              keyHeight={92}
-              onDigit={(d) => setCodeInput((c) => (c.length < OTP_LENGTH ? c + d : c))}
-              onBackspace={() => setCodeInput((c) => c.slice(0, -1))}
-            />
-          </View>
-        </View>
-      )}
+          </>,
+          <PersianKeypad
+            keyHeight={compact ? 60 : 92}
+            onDigit={(d) => setCodeInput((c) => (c.length < OTP_LENGTH ? c + d : c))}
+            onBackspace={() => setCodeInput((c) => c.slice(0, -1))}
+          />,
+        )}
 
       {phase === 'name' && (
         // Top-aligned so the soft keyboard (bottom half in landscape) never
@@ -297,6 +321,7 @@ const styles = StyleSheet.create({
   root: { flex: 1 },
   idle: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.md },
   logo: { width: '58%', aspectRatio: 3 },
+  logoCompact: { width: '88%' },
   clubTitle: { fontFamily: fonts.medium, fontSize: 30, color: colors.secondary },
   divider: { width: 140, height: 2, backgroundColor: colors.accent2, marginVertical: spacing.md },
   idlePrompt: { fontFamily: fonts.medium, fontSize: 26, color: colors.textMuted },
@@ -306,6 +331,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.xl,
     paddingHorizontal: spacing.xxl,
+  },
+  compactScroll: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
   },
   pane: { flex: 1, gap: spacing.lg, justifyContent: 'center' },
   paneTitle: { fontFamily: fonts.bold, fontSize: 30, color: colors.text, textAlign: 'center' },

@@ -130,7 +130,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   card: {
-    width: 420,
+    width: '92%',
+    maxWidth: 420,
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
     borderWidth: 1,

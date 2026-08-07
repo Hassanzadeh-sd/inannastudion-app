@@ -6,7 +6,8 @@ import { TEAM } from '../../constants/team';
 
 export default function CardsScreen() {
   const { width } = useWindowDimensions();
-  const cardWidth = width - spacing.xl * 2;
+  const compact = width < 700;
+  const cardWidth = width - (compact ? spacing.lg : spacing.xl) * 2;
   const people = TEAM.filter((p) => p.hasCard);
 
   return (
@@ -25,7 +26,7 @@ export default function CardsScreen() {
         decelerationRate="fast"
         renderItem={({ item }) => (
           <View style={[styles.page, { width }]}>
-            <QrBusinessCard person={item} width={cardWidth} />
+            <QrBusinessCard person={item} width={cardWidth} compact={compact} />
           </View>
         )}
       />
