@@ -10,7 +10,8 @@ export type SettingKey =
   | 'last_sync_at'
   | 'sms_api_key'
   | 'sms_template'
-  | 'server_mode';
+  | 'server_mode'
+  | 'last_seen_created_at';
 
 export async function getSetting(key: SettingKey): Promise<string | null> {
   const db = await getDb();

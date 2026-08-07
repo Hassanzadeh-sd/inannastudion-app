@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { AppState } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
@@ -13,6 +14,9 @@ import {
 import { getDb } from '../db';
 import { startSyncLoop } from '../lib/sync';
 import { colors } from '../theme';
+import { IS_EMPLOYEE_APP } from '../lib/variant';
+import { checkForNewCustomers, ensureNotificationPermission } from '../lib/notify';
+import { registerNewCustomerTask } from '../lib/notify-task';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -31,6 +35,18 @@ export default function RootLayout() {
       setDbReady(true);
       startSyncLoop();
     });
+  }, []);
+
+  // Employee app: notification permission, background polling, and an
+  // immediate check whenever the app returns to the foreground.
+  useEffect(() => {
+    if (!IS_EMPLOYEE_APP) return undefined;
+    void ensureNotificationPermission();
+    void registerNewCustomerTask();
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') void checkForNewCustomers();
+    });
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {
