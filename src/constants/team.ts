@@ -1,7 +1,6 @@
 /**
  * استادیو اینانا team: business cards + directory.
- * TODO(saji): replace placeholder people with the real team before the
- * exhibition. `phones[0]` is the primary number shown on the QR card.
+ * `phones[0]` is the primary number shown on the QR card.
  */
 export interface Person {
   id: string;
@@ -23,30 +22,31 @@ export const COMPANY_NAME_LATIN = 'Inanna Studio';
 
 export const TEAM: Person[] = [
   {
-    id: 'owner',
-    name: 'مدیر استادیو اینانا',
-    latinName: 'Inanna Studio',
-    role: 'مدیریت',
+    id: 'azin',
+    name: 'آذین',
+    latinName: 'Azin - Inanna Studio',
+    role: 'مدیر استادیو اینانا',
     company: COMPANY_NAME,
-    phones: ['09120000000'],
-    email: 'info@example.com',
+    phones: ['09354674923'],
     hasCard: true,
   },
   {
-    id: 'colleague-1',
-    name: 'همکار اول',
-    role: 'کارشناس فروش',
+    id: 'sajjad',
+    name: 'سجاد حسن‌زاده',
+    latinName: 'Sajjad Hassanzadeh - Inanna Studio',
+    role: 'همکار',
     company: COMPANY_NAME,
-    phones: ['09120000001'],
+    phones: ['09378228100'],
     hasCard: true,
   },
   {
-    id: 'colleague-2',
-    name: 'همکار دوم',
-    role: 'پشتیبانی',
+    id: 'parisa',
+    name: 'پریسا فیض',
+    latinName: 'Parisa Feyz - Inanna Studio',
+    role: 'همکار',
     company: COMPANY_NAME,
-    phones: ['09120000002'],
-    hasCard: false,
+    phones: ['09359341543'],
+    hasCard: true,
   },
 ];
 
