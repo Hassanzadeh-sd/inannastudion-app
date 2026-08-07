@@ -27,6 +27,17 @@ follow-ups, show QR business cards, and export/backup everything.
   app's Settings tab (API key + template). Unconfigured or failed SMS → the
   kiosk skips verification and still saves the number.
 
+## Two apps, one codebase
+
+- **Kiosk app** «استادیو اینانا» (`com.inannastudio.leads`): the booth tablet.
+  Download: `https://opendevtalk.com/inanna-studio.apk`
+- **Employee app** «اینانا همکار» (`com.inannastudio.employee`): built with
+  `APP_VARIANT=employee` (eas profile `employee`). Opens straight into the
+  server customers list; no kiosk, no PIN; server URL prefilled, employees
+  only paste the token in تنظیمات. Download:
+  `https://opendevtalk.com/inanna-employee.apk`
+- Build employee APK: `https_proxy=http://127.0.0.1:18888 npx eas-cli build -p android --profile employee`
+
 ## Before the exhibition
 
 1. Edit `src/constants/team.ts`: real names, roles, numbers, email for the QR
