@@ -17,6 +17,7 @@ import { pushPending } from '../../lib/sync';
 import { useSyncStatus } from '../../store/sync-status';
 import { shareCsv, shareXlsx } from '../../lib/exporter';
 import { formatFaDateTime, toPersianDigits } from '../../lib/digits';
+import { IS_EMPLOYEE_APP } from '../../lib/variant';
 import { useIsCompact } from '../../hooks/use-compact';
 
 const PHASE_FA: Record<string, string> = {
@@ -146,23 +147,33 @@ export default function SettingsScreen() {
             </Text>
             {sync.lastError ? <Text style={styles.errorText}>{sync.lastError}</Text> : null}
 
-            <Text style={styles.sectionTitle}>حالت همکار</Text>
-            <View style={styles.switchRow}>
-              <Switch
-                value={serverMode}
-                onValueChange={toggleServerMode}
-                thumbColor={serverMode ? colors.accent : colors.textFaint}
-                trackColor={{ false: colors.surfaceRaised, true: colors.accent2 }}
-              />
-              <Text style={styles.switchLabel}>نمایش و ویرایش مشتریان از سرور</Text>
-            </View>
-            <Text style={styles.hint}>
-              برای گوشی همکاران روشن کنید: فهرست مشتریان همه دستگاه‌ها را زنده می‌بینند و تکمیل
-              می‌کنند (نیازمند اینترنت). روی تبلت نمایشگاه خاموش بماند؛ ثبت شماره در هر حالت
-              آفلاین کار می‌کند
-            </Text>
+            {IS_EMPLOYEE_APP ? (
+              <Text style={styles.hint}>
+                این نسخه مخصوص همکاران است: فهرست مشتریان مستقیم از سرور خوانده و ویرایش می‌شود.
+                فقط توکن دسترسی را وارد و ذخیره کنید
+              </Text>
+            ) : (
+              <>
+                <Text style={styles.sectionTitle}>حالت همکار</Text>
+                <View style={styles.switchRow}>
+                  <Switch
+                    value={serverMode}
+                    onValueChange={toggleServerMode}
+                    thumbColor={serverMode ? colors.accent : colors.textFaint}
+                    trackColor={{ false: colors.surfaceRaised, true: colors.accent2 }}
+                  />
+                  <Text style={styles.switchLabel}>نمایش و ویرایش مشتریان از سرور</Text>
+                </View>
+                <Text style={styles.hint}>
+                  برای گوشی همکاران روشن کنید: فهرست مشتریان همه دستگاه‌ها را زنده می‌بینند و تکمیل
+                  می‌کنند (نیازمند اینترنت). روی تبلت نمایشگاه خاموش بماند؛ ثبت شماره در هر حالت
+                  آفلاین کار می‌کند
+                </Text>
+              </>
+            )}
           </View>
 
+          {!IS_EMPLOYEE_APP && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>کد تأیید پیامکی (کلوپ مشتریان)</Text>
             <Text style={styles.label}>کلید API کاوه‌نگار</Text>
@@ -211,6 +222,7 @@ export default function SettingsScreen() {
               onPress={() => router.push('/pin?mode=change')}
             />
           </View>
+          )}
         </View>
       </ScrollView>
     </View>

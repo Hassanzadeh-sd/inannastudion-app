@@ -13,6 +13,7 @@ import {
   type LeadSort,
 } from '../../../db/leads.repo';
 import { getSetting } from '../../../db/settings.repo';
+import { IS_EMPLOYEE_APP } from '../../../lib/variant';
 import { useLeadsVersion } from '../../../store/leads-version';
 import { useServerLeads } from '../../../store/server-leads';
 import { toPersianDigits } from '../../../lib/digits';
@@ -53,7 +54,7 @@ export default function LeadsListScreen() {
   const [subtitle, setSubtitle] = useState('');
 
   useEffect(() => {
-    getSetting('server_mode').then((v) => setServerMode(v === '1'));
+    getSetting('server_mode').then((v) => setServerMode(IS_EMPLOYEE_APP || v === '1'));
   }, []);
 
   // Employee mode: poll the shared server list while this screen is open.

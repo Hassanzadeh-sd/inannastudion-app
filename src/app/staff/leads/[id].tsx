@@ -23,6 +23,7 @@ import {
   type LeadStatus,
 } from '../../../db/leads.repo';
 import { getSetting } from '../../../db/settings.repo';
+import { IS_EMPLOYEE_APP } from '../../../lib/variant';
 import { updateServerLead } from '../../../lib/server-leads';
 import { useServerLeads } from '../../../store/server-leads';
 import { bumpLeadsVersion } from '../../../store/leads-version';
@@ -62,7 +63,7 @@ export default function LeadDetailScreen() {
   useEffect(() => {
     if (!id) return;
     (async () => {
-      const isServer = (await getSetting('server_mode')) === '1';
+      const isServer = IS_EMPLOYEE_APP || (await getSetting('server_mode')) === '1';
       setServerMode(isServer);
       const lead: Lead | null = isServer
         ? (useServerLeads.getState().leads.find((l) => l.id === id) ?? null)

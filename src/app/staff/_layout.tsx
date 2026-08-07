@@ -4,15 +4,26 @@ import { Redirect, Tabs, useRouter } from 'expo-router';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { colors, fonts } from '../../theme';
 import { RELOCK_AFTER_MS, useSession } from '../../store/session';
+import { DEFAULT_SYNC_URL, IS_EMPLOYEE_APP } from '../../lib/variant';
+import { getSetting, setSetting } from '../../db/settings.repo';
 
 export default function StaffLayout() {
   const unlocked = useSession((s) => s.unlocked);
   const touch = useSession((s) => s.touch);
   const router = useRouter();
 
-  // Auto-relock after inactivity and drop back to the kiosk.
+  // Employee app: always server mode, server URL prefilled on first launch.
   useEffect(() => {
-    if (!unlocked) return undefined;
+    if (!IS_EMPLOYEE_APP) return;
+    void (async () => {
+      await setSetting('server_mode', '1');
+      if (!(await getSetting('sync_url'))) await setSetting('sync_url', DEFAULT_SYNC_URL);
+    })();
+  }, []);
+
+  // Auto-relock after inactivity and drop back to the kiosk (kiosk app only).
+  useEffect(() => {
+    if (IS_EMPLOYEE_APP || !unlocked) return undefined;
     const t = setInterval(() => {
       const { lastActivity, lock } = useSession.getState();
       if (Date.now() - lastActivity > RELOCK_AFTER_MS) {
@@ -23,7 +34,7 @@ export default function StaffLayout() {
     return () => clearInterval(t);
   }, [unlocked, router]);
 
-  if (!unlocked) return <Redirect href="/kiosk" />;
+  if (!IS_EMPLOYEE_APP && !unlocked) return <Redirect href="/kiosk" />;
 
   return (
     <View

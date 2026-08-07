@@ -12,6 +12,10 @@
       "distribution": "internal",
       "autoIncrement": true,
       "android": { "buildType": "apk" }
+    },
+    "employee": {
+      "extends": "production",
+      "env": { "APP_VARIANT": "employee" }
     }
   }
 }
