@@ -47,3 +47,6 @@ server/.token
 server/node_modules/
 
 server/.admin-password
+
+# Kavenegar SMS key (lives on the VPS in /etc/leadsync.env)
+server/.kavenegar-key
