@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
+  Alert,
   ScrollView,
   StyleSheet,
   Switch,
@@ -13,6 +14,8 @@ import { colors, fonts, radius, spacing } from '../../theme';
 import { StaffHeader } from '../../components/StaffHeader';
 import { BigButton } from '../../components/BigButton';
 import { getSetting, setSetting } from '../../db/settings.repo';
+import { deleteAllLocalLeads } from '../../db/leads.repo';
+import { bumpLeadsVersion } from '../../store/leads-version';
 import { pushPending } from '../../lib/sync';
 import { useSyncStatus } from '../../store/sync-status';
 import { shareCsv, shareXlsx } from '../../lib/exporter';
@@ -90,6 +93,25 @@ export default function SettingsScreen() {
         ? `ارسال شد (${toPersianDigits(result.pushed)} مورد)`
         : `خطا: ${result.error ?? ''}`,
       ToastAndroid.LONG,
+    );
+  };
+
+  const wipeDevice = () => {
+    Alert.alert(
+      'پاک کردن مشتریان این دستگاه',
+      'همه مشتریان ذخیره‌شده روی این دستگاه حذف می‌شوند. این کار برگشت‌پذیر نیست.',
+      [
+        { text: 'انصراف', style: 'cancel' },
+        {
+          text: 'پاک کن',
+          style: 'destructive',
+          onPress: async () => {
+            const removed = await deleteAllLocalLeads();
+            bumpLeadsVersion();
+            ToastAndroid.show(`${toPersianDigits(removed)} مشتری پاک شد`, ToastAndroid.LONG);
+          },
+        },
+      ],
     );
   };
 
@@ -221,6 +243,12 @@ export default function SettingsScreen() {
               variant="ghost"
               onPress={() => router.push('/pin?mode=change')}
             />
+
+            <Text style={styles.sectionTitle}>پاک کردن اطلاعات</Text>
+            <BigButton label="پاک کردن مشتریان این دستگاه" variant="danger" onPress={wipeDevice} />
+            <Text style={styles.hint}>
+              فقط فهرست این دستگاه پاک می‌شود؛ اطلاعات ارسال‌شده روی سرور باقی می‌ماند
+            </Text>
           </View>
           )}
         </View>

@@ -16,7 +16,7 @@ import { colors, fonts, gradients, radius, spacing } from '../theme';
 import { PersianKeypad } from '../components/PersianKeypad';
 import { PinDots } from '../components/PinDots';
 import { BigButton } from '../components/BigButton';
-import { captureLead, setLeadName, setLeadVerified } from '../db/leads.repo';
+import { captureLead, findLeadByPhone, setLeadName, setLeadVerified } from '../db/leads.repo';
 import { bumpLeadsVersion } from '../store/leads-version';
 import { isValidIranMobile, formatPhoneFa } from '../lib/phone';
 import { ltrIsolate, toPersianDigits } from '../lib/digits';
@@ -24,7 +24,10 @@ import { pushSoon } from '../lib/sync';
 import { generateOtpCode, getOtpConfig, sendOtpSms } from '../lib/otp';
 import { useIsCompact } from '../hooks/use-compact';
 
-type Phase = 'idle' | 'phone' | 'verify' | 'name' | 'thanks';
+type Phase = 'idle' | 'phone' | 'verify' | 'name' | 'thanks' | 'already';
+
+/** Names shorter than this are almost always mistyped. */
+const MIN_NAME_LENGTH = 6;
 
 /**
  * Wide screens (tablet): two panes side by side. Compact screens (employee
@@ -148,6 +151,13 @@ export default function KioskScreen() {
 
   const submitPhone = async () => {
     if (!isValidIranMobile(phone)) return;
+    // Already a member: greet them by name instead of re-registering.
+    const existing = await findLeadByPhone(phone);
+    if (existing) {
+      setName(existing.name ?? '');
+      setPhase('already');
+      return;
+    }
     // Insert immediately: whatever happens next, the number is kept.
     leadIdRef.current = await captureLead(phone);
     bumpLeadsVersion();
@@ -181,9 +191,12 @@ export default function KioskScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [codeInput, phase]);
 
+  const nameIsValid = name.trim().length >= MIN_NAME_LENGTH;
+
   const submitName = async () => {
     const trimmed = name.trim();
-    if (trimmed && leadIdRef.current) {
+    if (!nameIsValid) return;
+    if (leadIdRef.current) {
       await setLeadName(leadIdRef.current, trimmed);
       bumpLeadsVersion();
       pushSoon();
@@ -215,7 +228,7 @@ export default function KioskScreen() {
             <Text style={styles.paneTitle}>شماره موبایل خود را وارد کنید</Text>
             <View style={styles.phoneDisplay}>
               <Text style={[styles.phoneText, !phone && styles.phonePlaceholder]}>
-                {phone ? ltrIsolate(formatPhoneFa(phone)) : ltrIsolate('۰۹۱۲ ۳۴۵ ۶۷۸۹')}
+                {phone ? ltrIsolate(formatPhoneFa(phone)) : ltrIsolate('۰۹۹۱ ۳۴۰ ۶۹۱۹')}
               </Text>
             </View>
             <BigButton
@@ -282,8 +295,13 @@ export default function KioskScreen() {
             onSubmitEditing={submitName}
             returnKeyType="done"
           />
+          <Text style={styles.nameHint}>
+            {name.trim().length > 0 && !nameIsValid
+              ? 'نام و نام خانوادگی را کامل بنویسید'
+              : 'نام و نام خانوادگی خود را وارد کنید'}
+          </Text>
           <View style={styles.nameActions}>
-            <BigButton label="ثبت نام" size="lg" onPress={submitName} disabled={!name.trim()} />
+            <BigButton label="ثبت نام" size="lg" onPress={submitName} disabled={!nameIsValid} />
             <BigButton
               label="رد شدن"
               variant="ghost"
@@ -294,6 +312,22 @@ export default function KioskScreen() {
               }}
             />
           </View>
+        </View>
+      )}
+
+      {phase === 'already' && (
+        <View style={styles.center}>
+          <Image
+            source={require('../../assets/images/logo-emblem.png')}
+            style={styles.thanksEmblem}
+            contentFit="contain"
+          />
+          <Text style={styles.thanksTitle}>
+            {name.trim() ? `${name.trim()} عزیز` : 'خوش آمدید'}
+          </Text>
+          <Text style={styles.thanksBody}>شما پیش از این عضو کلوپ اینانا شده‌اید</Text>
+          <Text style={styles.alreadyPhone}>{ltrIsolate(formatPhoneFa(phone))}</Text>
+          <BigButton label="بازگشت" variant="ghost" size="lg" onPress={reset} />
         </View>
       )}
 
@@ -393,6 +427,13 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   nameActions: { flexDirection: 'row', gap: spacing.md },
+  nameHint: { fontFamily: fonts.regular, fontSize: 16, color: colors.textMuted },
+  alreadyPhone: {
+    fontFamily: fonts.bold,
+    fontSize: 26,
+    color: colors.accentSoft,
+    marginBottom: spacing.sm,
+  },
   thanksEmblem: { width: 180, height: 130 },
   thanksTitle: { fontFamily: fonts.black, fontSize: 56, color: colors.text },
   thanksBody: { fontFamily: fonts.medium, fontSize: 30, color: colors.accentSoft },

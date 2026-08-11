@@ -60,14 +60,22 @@ const upsert = db.prepare(`
   WHERE excluded.updated_at > leads.updated_at
 `);
 
+/**
+ * One customer per phone number. Devices mint their own UUIDs, so the same
+ * visitor registering on two devices would otherwise land twice; we reuse the
+ * id already stored for that phone and let last-write-wins merge the fields.
+ */
+const findIdByPhone = db.prepare('SELECT id FROM leads WHERE phone = ? LIMIT 1');
+
 const upsertBatch = db.transaction((records, deviceId, receivedAt) => {
   const accepted = [];
   for (const r of records) {
     if (typeof r?.id !== 'string' || typeof r?.phone !== 'string' || typeof r?.updated_at !== 'string') {
       continue;
     }
+    const existing = findIdByPhone.get(r.phone);
     upsert.run({
-      id: r.id,
+      id: existing ? existing.id : r.id,
       phone: r.phone,
       name: r.name ?? null,
       rating: Number.isInteger(r.rating) ? r.rating : null,
@@ -522,6 +530,16 @@ app.post('/admin/api/leads/:id', adminAuth, (req, res) => {
   if (patch.rating != null && !Number.isInteger(patch.rating)) patch.rating = null;
   if (!['new', 'contacted', 'done'].includes(patch.status)) patch.status = current.status;
   updateFromAdmin.run({ ...patch, id: current.id, updated_at: new Date().toISOString() });
+  res.json({ ok: true });
+});
+
+/** Soft delete from the employee app or web panel. */
+app.delete('/admin/api/leads/:id', adminAuth, (req, res) => {
+  const now = new Date().toISOString();
+  const info = db
+    .prepare('UPDATE leads SET deleted_at = @now, updated_at = @now WHERE id = @id')
+    .run({ id: req.params.id, now });
+  if (!info.changes) return res.status(404).json({ ok: false, error: 'not_found' });
   res.json({ ok: true });
 });
 

@@ -50,10 +50,15 @@ export const TEAM: Person[] = [
   },
 ];
 
+/** Multi-select tags an employee attaches to a customer (pick any number). */
 export const FOLLOWUP_CHIPS = [
-  'تماس هفته آینده',
-  'ارسال کاتالوگ',
-  'دعوت به دفتر',
-  'پیگیری در تلگرام',
-  'ارسال پیش‌فاکتور',
+  'همکاری',
+  'مشتری ثابت قدیمی',
+  'سفارش قطعی',
+  'ارسال سایت',
+  'مراجعه حضوری',
+  'پیگیری',
+  'تیشرت دست دوز',
+  'تیشرت چاپ',
+  'جوراب',
 ] as const;

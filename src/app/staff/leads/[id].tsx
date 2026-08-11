@@ -24,7 +24,7 @@ import {
 } from '../../../db/leads.repo';
 import { getSetting } from '../../../db/settings.repo';
 import { IS_EMPLOYEE_APP } from '../../../lib/variant';
-import { updateServerLead } from '../../../lib/server-leads';
+import { deleteServerLead, updateServerLead } from '../../../lib/server-leads';
 import { useServerLeads } from '../../../store/server-leads';
 import { bumpLeadsVersion } from '../../../store/leads-version';
 import { FOLLOWUP_CHIPS } from '../../../constants/team';
@@ -122,9 +122,19 @@ export default function LeadDetailScreen() {
         style: 'destructive',
         onPress: async () => {
           if (!id) return;
-          await softDeleteLead(id);
-          bumpLeadsVersion();
-          pushSoon();
+          if (serverMode) {
+            const ok = await deleteServerLead(id);
+            if (!ok) {
+              ToastAndroid.show('حذف روی سرور ناموفق بود', ToastAndroid.LONG);
+              return;
+            }
+            void serverStore.refresh();
+          } else {
+            await softDeleteLead(id);
+            bumpLeadsVersion();
+            pushSoon();
+          }
+          ToastAndroid.show('حذف شد', ToastAndroid.SHORT);
           router.back();
         },
       },
@@ -214,7 +224,7 @@ export default function LeadDetailScreen() {
 
         <View style={styles.actions}>
           <BigButton label="ذخیره" size="lg" onPress={save} style={styles.saveButton} />
-          {!serverMode ? <BigButton label="حذف" variant="danger" onPress={remove} /> : null}
+          <BigButton label="حذف" variant="danger" onPress={remove} />
         </View>
       </ScrollView>
     </View>

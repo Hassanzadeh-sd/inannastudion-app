@@ -100,6 +100,15 @@ export async function softDeleteLead(id: string): Promise<void> {
   );
 }
 
+/** Existing member lookup for the kiosk's duplicate check. */
+export async function findLeadByPhone(phone: string): Promise<Lead | null> {
+  const db = await getDb();
+  return await db.getFirstAsync<Lead>(
+    'SELECT * FROM leads WHERE phone = ? AND deleted_at IS NULL',
+    [phone],
+  );
+}
+
 export async function getLead(id: string): Promise<Lead | null> {
   const db = await getDb();
   return await db.getFirstAsync<Lead>('SELECT * FROM leads WHERE id = ?', [id]);
@@ -153,6 +162,13 @@ export async function exportableLeads(): Promise<Lead[]> {
   return await db.getAllAsync<Lead>(
     'SELECT * FROM leads WHERE deleted_at IS NULL ORDER BY created_at ASC',
   );
+}
+
+/** Wipe this device's customer list (staff action; server copy is untouched). */
+export async function deleteAllLocalLeads(): Promise<number> {
+  const db = await getDb();
+  const result = await db.runAsync('DELETE FROM leads');
+  return result.changes;
 }
 
 /** Sync helpers */

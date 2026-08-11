@@ -49,3 +49,8 @@ export async function updateServerLead(id: string, patch: LeadPatch): Promise<bo
   });
   return res?.ok ?? false;
 }
+
+export async function deleteServerLead(id: string): Promise<boolean> {
+  const res = await request(`/admin/api/leads/${id}`, { method: 'DELETE' });
+  return res?.ok ?? false;
+}
