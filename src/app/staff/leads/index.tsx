@@ -11,6 +11,7 @@ import { IS_EMPLOYEE_APP } from '../../../lib/variant';
 import { useLeadsVersion } from '../../../store/leads-version';
 import { useServerLeads } from '../../../store/server-leads';
 import { toAsciiDigits, toPersianDigits } from '../../../lib/digits';
+import { confirmDeleteLead } from '../../../lib/delete-lead';
 
 type Completeness = 'incomplete' | 'complete' | 'all';
 
@@ -115,6 +116,11 @@ export default function LeadsListScreen() {
     [router],
   );
 
+  const deleteLead = useCallback(
+    (id: string) => confirmDeleteLead(id, !!serverMode),
+    [serverMode],
+  );
+
   return (
     <View style={styles.root}>
       <StaffHeader title="ثبت اطلاعات مشتریان" subtitle={subtitle} />
@@ -164,7 +170,7 @@ export default function LeadsListScreen() {
       <FlatList
         data={leads}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <LeadListItem lead={item} onPress={openLead} />}
+        renderItem={({ item }) => <LeadListItem lead={item} onPress={openLead} onDelete={deleteLead} />}
         contentContainerStyle={styles.list}
         keyboardShouldPersistTaps="handled"
         ListEmptyComponent={

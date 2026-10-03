@@ -169,7 +169,7 @@ const WELCOME_TICK_MS = 60_000;
 const WELCOME_BATCH = 20;
 const WELCOME_MAX_ATTEMPTS = 3;
 /** Kavenegar codes that mean "account/sender not ready", not "bad recipient". */
-const SMS_CONFIG_ERRORS = new Set([412, 501, 502, 503, 411, 418, 419]);
+const SMS_CONFIG_ERRORS = new Set([412, 427, 430, 501, 502, 503, 411, 418, 419]);
 
 try {
   db.exec('ALTER TABLE leads ADD COLUMN welcome_sent_at TEXT');

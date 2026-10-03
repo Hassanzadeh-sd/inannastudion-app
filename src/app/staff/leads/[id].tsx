@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,7 +15,6 @@ import { StarRating } from '../../../components/StarRating';
 import { STATUS_FA } from '../../../components/LeadListItem';
 import {
   getLead,
-  softDeleteLead,
   updateLead,
   type Lead,
   type LeadPatch,
@@ -24,7 +22,8 @@ import {
 } from '../../../db/leads.repo';
 import { getSetting } from '../../../db/settings.repo';
 import { IS_EMPLOYEE_APP } from '../../../lib/variant';
-import { deleteServerLead, updateServerLead } from '../../../lib/server-leads';
+import { updateServerLead } from '../../../lib/server-leads';
+import { confirmDeleteLead } from '../../../lib/delete-lead';
 import { useServerLeads } from '../../../store/server-leads';
 import { bumpLeadsVersion } from '../../../store/leads-version';
 import { FOLLOWUP_CHIPS } from '../../../constants/team';
@@ -115,30 +114,7 @@ export default function LeadDetailScreen() {
   };
 
   const remove = () => {
-    Alert.alert('حذف مشتری', 'اطلاعات این مشتری حذف شود؟', [
-      { text: 'انصراف', style: 'cancel' },
-      {
-        text: 'حذف',
-        style: 'destructive',
-        onPress: async () => {
-          if (!id) return;
-          if (serverMode) {
-            const ok = await deleteServerLead(id);
-            if (!ok) {
-              ToastAndroid.show('حذف روی سرور ناموفق بود', ToastAndroid.LONG);
-              return;
-            }
-            void serverStore.refresh();
-          } else {
-            await softDeleteLead(id);
-            bumpLeadsVersion();
-            pushSoon();
-          }
-          ToastAndroid.show('حذف شد', ToastAndroid.SHORT);
-          router.back();
-        },
-      },
-    ]);
+    if (id) confirmDeleteLead(id, serverMode, () => router.back());
   };
 
   if (!loaded) return <View style={styles.root} />;

@@ -21,9 +21,11 @@ const STATUS_COLOR: Record<LeadStatus, string> = {
 interface Props {
   lead: Lead;
   onPress: (id: string) => void;
+  /** Shows a trash icon on the row when given. */
+  onDelete?: (id: string) => void;
 }
 
-export const LeadListItem = memo(function LeadListItem({ lead, onPress }: Props) {
+export const LeadListItem = memo(function LeadListItem({ lead, onPress, onDelete }: Props) {
   return (
     <Pressable
       onPress={() => onPress(lead.id)}
@@ -56,6 +58,16 @@ export const LeadListItem = memo(function LeadListItem({ lead, onPress }: Props)
           />
         ))}
       </View>
+      {onDelete ? (
+        <Pressable
+          onPress={() => onDelete(lead.id)}
+          hitSlop={12}
+          accessibilityLabel="حذف مشتری"
+          style={({ pressed }) => [styles.delete, pressed && styles.pressed]}
+        >
+          <MaterialCommunityIcons name="trash-can-outline" size={24} color={colors.danger} />
+        </Pressable>
+      ) : null}
     </Pressable>
   );
 });
@@ -91,5 +103,6 @@ const styles = StyleSheet.create({
   member: { fontFamily: fonts.medium, fontSize: 13, color: colors.success },
   phone: { fontFamily: fonts.medium, fontSize: 18, color: colors.accentSoft },
   date: { fontFamily: fonts.regular, fontSize: 13, color: colors.textFaint },
-  stars: { flexDirection: 'row', gap: 2 },
+  stars: { flexDirection: 'row', gap: 2, marginStart: 'auto' },
+  delete: { padding: spacing.sm, marginStart: spacing.md },
 });
