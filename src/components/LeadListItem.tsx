@@ -5,6 +5,7 @@ import { colors, fonts, radius, spacing } from '../theme';
 import type { Lead, LeadStatus } from '../db/leads.repo';
 import { formatFaDateTime, ltrIsolate } from '../lib/digits';
 import { formatPhoneFa } from '../lib/phone';
+import { useIsCompact } from '../hooks/use-compact';
 
 export const STATUS_FA: Record<LeadStatus, string> = {
   new: 'جدید',
@@ -26,10 +27,17 @@ interface Props {
 }
 
 export const LeadListItem = memo(function LeadListItem({ lead, onPress, onDelete }: Props) {
+  // Phones stack the stars + delete under the details so the number keeps
+  // the full row width instead of being squeezed beside them.
+  const compact = useIsCompact();
   return (
     <Pressable
       onPress={() => onPress(lead.id)}
-      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.card,
+        compact && styles.cardCompact,
+        pressed && styles.pressed,
+      ]}
     >
       <View style={styles.main}>
         <View style={styles.nameRow}>
@@ -45,29 +53,33 @@ export const LeadListItem = memo(function LeadListItem({ lead, onPress, onDelete
           </Text>
           {lead.verified_at ? <Text style={styles.member}>✦ عضو کلوپ</Text> : null}
         </View>
-        <Text style={styles.phone}>{ltrIsolate(formatPhoneFa(lead.phone))}</Text>
+        <Text style={styles.phone} numberOfLines={1}>
+          {ltrIsolate(formatPhoneFa(lead.phone))}
+        </Text>
         <Text style={styles.date}>{formatFaDateTime(lead.created_at)}</Text>
       </View>
-      <View style={styles.stars}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <MaterialCommunityIcons
-            key={star}
-            name={star <= (lead.rating ?? 0) ? 'star' : 'star-outline'}
-            size={22}
-            color={star <= (lead.rating ?? 0) ? colors.star : colors.starOff}
-          />
-        ))}
+      <View style={[styles.side, compact && styles.sideCompact]}>
+        <View style={styles.stars}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <MaterialCommunityIcons
+              key={star}
+              name={star <= (lead.rating ?? 0) ? 'star' : 'star-outline'}
+              size={22}
+              color={star <= (lead.rating ?? 0) ? colors.star : colors.starOff}
+            />
+          ))}
+        </View>
+        {onDelete ? (
+          <Pressable
+            onPress={() => onDelete(lead.id)}
+            hitSlop={12}
+            accessibilityLabel="حذف مشتری"
+            style={({ pressed }) => [styles.delete, pressed && styles.pressed]}
+          >
+            <MaterialCommunityIcons name="trash-can-outline" size={24} color={colors.danger} />
+          </Pressable>
+        ) : null}
       </View>
-      {onDelete ? (
-        <Pressable
-          onPress={() => onDelete(lead.id)}
-          hitSlop={12}
-          accessibilityLabel="حذف مشتری"
-          style={({ pressed }) => [styles.delete, pressed && styles.pressed]}
-        >
-          <MaterialCommunityIcons name="trash-can-outline" size={24} color={colors.danger} />
-        </Pressable>
-      ) : null}
     </Pressable>
   );
 });
@@ -86,9 +98,26 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   pressed: { opacity: 0.8 },
-  main: { gap: 2, flexShrink: 1 },
-  nameRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  name: { fontFamily: fonts.bold, fontSize: 20, color: colors.text, maxWidth: 320 },
+  cardCompact: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: spacing.sm,
+  },
+  main: { gap: 2, flexGrow: 1, flexShrink: 1, minWidth: 0 },
+  nameRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    columnGap: spacing.md,
+  },
+  side: { flexDirection: 'row', alignItems: 'center' },
+  sideCompact: { justifyContent: 'space-between' },
+  name: {
+    fontFamily: fonts.bold,
+    fontSize: 20,
+    color: colors.text,
+    maxWidth: 320,
+  },
   noName: {
     fontFamily: fonts.medium,
     fontSize: 15,
@@ -103,6 +132,6 @@ const styles = StyleSheet.create({
   member: { fontFamily: fonts.medium, fontSize: 13, color: colors.success },
   phone: { fontFamily: fonts.medium, fontSize: 18, color: colors.accentSoft },
   date: { fontFamily: fonts.regular, fontSize: 13, color: colors.textFaint },
-  stars: { flexDirection: 'row', gap: 2, marginStart: 'auto' },
+  stars: { flexDirection: 'row', gap: 2 },
   delete: { padding: spacing.sm, marginStart: spacing.md },
 });
