@@ -22,12 +22,12 @@ export const COMPANY_NAME_LATIN = 'Inanna Studio';
 
 export const TEAM: Person[] = [
   {
-    id: 'azin',
-    name: 'آذین',
-    latinName: 'Azin - Inanna Studio',
-    role: 'مدیر استادیو اینانا',
+    id: 'management',
+    name: 'اینانا استادیو',
+    latinName: 'Inanna Studio',
+    role: 'مدیریت',
     company: COMPANY_NAME,
-    phones: ['09354674923'],
+    phones: ['09913406919'],
     hasCard: true,
   },
   {
